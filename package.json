@@ -1,0 +1,17 @@
+{
+  "name": "tp01",
+  "version": "1.0.0",
+  "description": "tp 01 creacion api",
+  "main": "script.js",
+  "module": "main",
+  "scripts": {
+    "type": "module",
+    "start": "node script.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Uriel Cwirenbaum e Iván Latascheff",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.1"
+  }
+}
