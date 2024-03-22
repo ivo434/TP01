@@ -4,9 +4,10 @@
   "description": "tp 01 creacion api",
   "main": "script.js",
   "module": "main",
+  "type": "module",
   "scripts": {
-    "type": "module",
-    "start": "node script.js",
+    
+    "start": "node src/script.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Uriel Cwirenbaum e Iván Latascheff",
