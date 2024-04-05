@@ -1,4 +1,4 @@
 import { query } from "express";
-class UsersService {
+class UserService {
     LoginUsuario()
 }
