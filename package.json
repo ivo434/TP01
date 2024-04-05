@@ -6,13 +6,13 @@
   "module": "main",
   "type": "module",
   "scripts": {
-    
     "start": "node src/script.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Uriel Cwirenbaum e Iván Latascheff",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.19.1"
   }
 }
