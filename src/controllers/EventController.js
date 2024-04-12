@@ -28,5 +28,18 @@ router.get("/event", (req, res) => {
 
     return res.json(DetallesEvento);
 });
+router.get("/event", (req, res) => {
+    const id_event = req.query.id_event;
+    const first_name = req.query.first_name;
+    const last_name = req.query.last_name;
+    const username = req.query.username;
+    const attended = req.query.attended;
+    const rating = req.query.rating;
+    const limit = req.query.limit;
+    const offset = req.query.offset;
+    const ListaParticipantes = EventService.ListaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset)
+
+    return res.json(ListaParticipantes);
+});
 
 export default router;
