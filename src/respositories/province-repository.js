@@ -1,9 +1,4 @@
-import pg from "pg";
-import { BDConfig } from '../BD/bd';
-import { query } from "express";
 
-const client = new pg.Client();
-client.connect();
 
 class ProvinceRepository {
     CrearProvincia(name, full_name, latitude, longitude, display_order){ // display_order >= 0
@@ -38,16 +33,16 @@ class ProvinceRepository {
         }
         query += 'WHERE id = ' + id
         const listQueryDB = query.execute(query);
-        return {}
+        return query
     }
     GetAllProvincias(){
         var query = 'SELECT * From provinces limit '  + limit + ' offset ' + offset
         const listQueryDB = query.execute(query);
-        return {}
+        return query
     }
     GetProvinciasById(id){
         var query = 'SELECT * From provinces WHERE id = ' + id
         const listQueryDB = query.execute(query);
-        return {}
+        return query
     }
 }

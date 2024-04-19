@@ -1,4 +1,10 @@
-import { query } from "express";
-class UserService {
-    LoginUsuario()
+
+
+class userRepository {
+    LoginUsuario(){
+
+    }
+    RegisterUsuario(first_name, last_name, username, password){
+
+    }
 }

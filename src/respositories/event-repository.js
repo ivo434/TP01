@@ -1,21 +1,12 @@
-import pg from "pg";
-import { BDConfig } from '../BD/bd';
-import { query } from "express";
-
-const client = new pg.Client();
-client.connect();
-
 class EventRepository{
-    GetListadoEventos(limit, offset){
-        // Ir a BD
-        var query = 'select name , description , event_categories.name , event_locations.name , event_locations.full_address , start_date , duration_in_minutes , price , enabled_for_enrollment , max_assistance , users.first_name , users.last_name from events inner join event_locations on events.id_event_location = event_locations.id inner join event_categories on events.id_event_category = event_categories.id inner join users on events.id_creator_user = users.id limit ' + limit + ' offset ' + offset
-        const listQueryDB = query.execute(query);
-        return {}
+    getListadoEventos(limit, offset) {
+        var query = `SELECT name, description, event_categories.name, event_locations.name, event_locations.full_address, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, users.first_name, users.last_name FROM events INNER JOIN event_locations ON events.id_event_location = event_locations.id INNER JOIN event_categories ON events.id_event_category = event_categories.id INNER JOIN users ON events.id_creator_user = users.id LIMIT ${limit} OFFSET ${offset}`;
+        return query;
     }
-    BusquedaEventos(name, category, startDate, tag, limit, offset) {
-        var query = 'SELECT name, event_categories.name, start_date, tags.name FROM events WHERE '
+    busquedaEventos(name, category, startDate, tag, limit, offset) {
+        var query = `SELECT name, event_categories.name, start_date, tags.name FROM events WHERE `;
         if (name != null) {
-            query += 'name = ' + name +  ' AND ';
+            query += `name = '${name}' AND `;
         }
         if (category != null) {
             query += 'category = ' + category + ' AND ';
@@ -27,22 +18,20 @@ class EventRepository{
             query += 'tag = ' + tag + ' AND ';
         }
         if (query.endsWith(' AND ')) {
-            query = query.slice(0,-4);
+            query = query.slice(0, -5);
+        } else if (query.endsWith(' WHERE ')) {
+            query = query.slice(0, -7);
         }
-        else if (query.endsWith(' WHERE ')) {
-            query = query.slice(0,-6);
-        }
-        query += ' INNER JOIN event_categories ON events.id_event_category = event_categories.id INNER JOIN event_tags ON events.id = event_tags.id_event INNER JOIN tags ON event_tags.id_tag = tags.id limit ' + limit + ' offset ' + offset
-        const listQueryDB = query.execute(query);
-        return {}
+        query += ` INNER JOIN event_categories ON events.id_event_category = event_categories.id INNER JOIN event_tags ON events.id = event_tags.id_event INNER JOIN tags ON event_tags.id_tag = tags.id LIMIT ${limit} OFFSET ${offset}`;
+        return query;
     }
-    DetalleEventos(id, limit, offset){
-        // Ir a BD
-        // Terminar el query cuando tengamos la base de datos, solo faltaria poner los datos uno por uno
-        var query = 'SELECT * From events WHERE id = ' + id + ' INNER JOIN event_locations ON id_event_location = event_locations.id INNER JOIN locations on event_locations.id = locations.id INNER JOIN provinces ON locations.id = provinces.id limit ' + limit + ' offset ' + offset
-        const listQueryDB = query.execute(query);
-        return {}
+
+    detalleEventos(id, limit, offset) {
+        var query = `SELECT * FROM events WHERE id = ${id} INNER JOIN event_locations ON id_event_location = event_locations.id INNER JOIN locations ON event_locations.id = locations.id INNER JOIN provinces ON locations.id = provinces.id LIMIT ${limit} OFFSET ${offset}`;
+        // Execute the query, handle errors, and return result
+        return query; // Placeholder, handle errors and return result
     }
+    
 
     ListaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset){
         if (attended != true && attended != null || attended != false && attended != null) {
@@ -71,20 +60,17 @@ class EventRepository{
             else if (query.endsWith(' HAVING ')) {
                 query = query.slice(0,-7);
             }
-            query += ' limit ' + limit + ' offset ' + offset
-            const listQueryDB = query.execute(query);
-            return {}
+            query += ` LIMIT ${limit} OFFSET ${offset}`;
+            return query;
         }
     }
     CrearEvento(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){ // display_order >= 0
-        var query = 'INSERT INTO provinces (name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) VALUES ' + name + ', ' + description + ', ' + id_event_category + ', ' + id_event_location + ', ' + start_date + ', ' + duration_in_minutes + ', ' + price + ', ' + enabled_for_enrollment + ', ' + max_assistance + ", " + id_creator_user;
-        const listQueryDB = query.execute(query);
-        return {}
+        var query = `INSERT INTO events (name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) VALUES ('${name}', '${description}', ${id_event_category}, ${id_event_location}, '${start_date}', ${duration_in_minutes}, ${price}, ${enabled_for_enrollment}, ${max_assistance}, ${id_creator_user})`;        const listQueryDB = query.execute(query);
+        return query;
     }
     BorrarEvento(id, id_creator_user){
-        var query = 'DELETE FROM provinces WHERE id = ' + id + ' AND id_creator_user = ' + id_creator_user;
-        const listQueryDB = query.execute(query);
-        return {}
+        var query = `DELETE FROM events WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
+        return query
     }
     EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
         var query = 'UPDATE events SET'
@@ -118,10 +104,9 @@ class EventRepository{
         if (query.endsWith(', ')){
             query.substring(0,-1)
         }
-        query += 'WHERE id = ' + id + ' AND id_creator_user = ' + id_creator_user
+        query += updates.join(', ') + ` WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
         const listQueryDB = query.execute(query);
-        return {}
+        return query
     }
 }
-export default EventService;
-//client.query("SELECT * FROM events");
+export default EventRepository;
