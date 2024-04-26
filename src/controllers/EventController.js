@@ -26,21 +26,19 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/', async (req, res) => {
-    const { id } = req.params;
-    const { limit, offset } = req.query;
+router.get('/:id', async (req, res) => {
     try {
-        const event = await eventService.detalleEventos(id, limit, offset);
+        const event = await eventService.detalleEventos(req.params.id);
         res.json(event);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-router.get('/', async (req, res) => {
-    const {id_event, first_name, last_name, username, attended, rating, limit, offset } = req.query;
+router.get('/:id/enrollment', async (req, res) => {
+    const {first_name, last_name, username, attended, rating, limit, offset } = req.query;
     try {
-        const event = await eventService.detalleEventos(id_event, first_name, last_name, username, attended, rating, limit, offset);
+        const event = await eventService.detalleEventos(req.params.id, first_name, last_name, username, attended, rating, limit, offset);
         res.json(event);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -52,33 +50,70 @@ router.post('/', async (req, res) => {
     const eventData = req.body;
     try {
         const newEvent = await eventService.CrearEvento(...Object.values(eventData));
-        res.json(newEvent);
+        if (newEvent > 0){
+            return res.status(200).json({'mensaje':'Se elimino el evento'});
+        }else{
+            return res.status(400).json({'mensaje':'no se elimino'});
+        }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 
-router.delete('/', async (req, res) => {
-    const { id } = req.params;
+router.delete('/:id', async (req, res) => {
     const { id_creator_user } = req.body;
     try {
-        await eventService.BorrarEvento(id, id_creator_user);
-        res.json({ message: 'Event deleted successfully' });
+        const filas = await eventService.BorrarEvento(req.params.id, id_creator_user);
+        if (filas > 0){
+            return res.status(200).json({mensaje:'Se elimino el evento'});
+        }else{
+            return res.status(400).json({mensaje:'No se elimino'});
+        }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 
-router.put('/', async (req, res) => {
-    const { id } = req.params;
+router.put('/:id', async (req, res) => {
     const eventData = req.body;
     try {
-        await eventService.EditarEvento(id, ...Object.values(eventData));
-        res.json({ message: 'Event updated successfully' });
+        await eventService.EditarEvento(req.params.id, ...Object.values(eventData));
+        res.json({ message: 'Evento actualizado correctamente' });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+router.post("/:id/enrollment", (req, res) => {
+    try {
+        const event = eventService.postInscripcionEvento(req.params.id, req.body.id_user);
+        if(!event){
+            return res.status(400).json({ error: 'El formato de attended no es valido' });
+        } else{
+            return res.json("Se ha inscripto correctamente al evento");
+        }
+    }
+    catch(error){
+        console.log("Error al inscribir");
+        return res.json("Un Error");
+    }
+});
+
+
+router.patch("/:id/enrollment", (req, res) => {
+    if(!Number.isInteger(Number(req.body.rating))&& Number.isInteger(Number(req.body.attended))){
+        return res.status(400).json({ error: 'El formato de attended no es valido' });
+    }
+    const {rating, descripcion, attended, observation} = req.body
+    try {
+        const enrollment = eventService.patchEnrollment(rating, descripcion, attended, observation);
+        return res.json(enrollment);
+    }
+    catch(error){
+        console.log("Error al puntuar");
+        return res.json("Un Error");
     }
 });
 
