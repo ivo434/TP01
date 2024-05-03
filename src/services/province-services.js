@@ -1,13 +1,7 @@
 import ProvinceRepository from "../repositories/province-repository.js";
 import pg from "pg";
 
-const client = new pg.Client();
-client.connect();
-
 class ProvinceService {
-    constructor() {
-        this.ProvinceRepository = new ProvinceRepository();
-    }
 
     async crearProvincia(name, full_name, latitude, longitude, display_order) {
         try {

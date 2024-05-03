@@ -1,14 +1,12 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
 
-const client = new pg.Client(BDConfig);
-client.connect();
 export default class ProvinceRepository {
-    // constructor(){
-    //     const { Client } = pkg;
-    //     this.DBClient = new Client(BDConfig)
-    //     this.DBClient.connect()
-    // }
+    constructor(){
+        const { Client } = pg;
+        this.DBClient = new Client(BDConfig)
+        this.DBClient.connect()
+    }
     async CrearProvincia(name, full_name, latitude, longitude, display_order){ // display_order >= 0 // query con trabajo en clase
         try{
             var query = 'INSERT INTO provinces(name, full_name, latitude, longitude, display_order) VALUES $1, $2, $3, $4, $5'; //cada $ equivale a un valor, de izquierda a derecha

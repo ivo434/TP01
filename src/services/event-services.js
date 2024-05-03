@@ -1,10 +1,10 @@
 import EventRepository from "../repositories/event-repository.js";
-
+const eventRepository = new EventRepository();
 class EventService {
 
     async getListadoEventos(limit, offset) {
         try {
-            return await EventRepository.getListadoEventos(limit, offset);
+            return await eventRepository.getListadoEventos(limit, offset);
         } catch (error) {
             console.error('Error in getListadoEventos:', error);
             throw error;
@@ -13,7 +13,7 @@ class EventService {
 
     async busquedaEventos(name, category, startDate, tag, limit, offset) {
         try {
-            return await EventRepository.busquedaEventos(name, category, startDate, tag, limit, offset);
+            return await eventRepository.busquedaEventos(name, category, startDate, tag, limit, offset);
         } catch (error) {
             console.error('Error in busquedaEventos:', error);
             throw error;
@@ -22,7 +22,7 @@ class EventService {
 
     async detalleEventos(id, limit, offset) {
         try {
-            return await EventRepository.detalleEventos(id, limit, offset);
+            return await eventRepository.detalleEventos(id, limit, offset);
         } catch (error) {
             console.error('Error in detalleEventos:', error);
             throw error;
@@ -30,7 +30,7 @@ class EventService {
     }
     async listaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset) {
         try {
-            return await EventRepository.listaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset);
+            return await eventRepository.listaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset);
         } catch (error) {
             console.error('Error in detalleEventos:', error);
             throw error;
@@ -38,7 +38,7 @@ class EventService {
     }
     async CrearEvento(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) {
         try {
-            return await EventRepository.CrearEvento(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user);
+            return await eventRepository.CrearEvento(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user);
         } catch (error) {
             console.error('Error in CrearEvento:', error);
             throw error;
@@ -46,7 +46,7 @@ class EventService {
     }
     async BorrarEvento(id, id_creator_user) {
         try {
-            const result = await EventRepository.BorrarEvento(id, id_creator_user);
+            const result = await eventRepository.BorrarEvento(id, id_creator_user);
             filas = result.rowCount;
         } catch (error) {
             console.error('Error in BorrarEvento:', error);
@@ -56,7 +56,7 @@ class EventService {
     }
     async EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) {
         try {
-            return await EventRepository.EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user);
+            return await eventRepository.EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user);
         } catch (error) {
             console.error('Error in EditarEvento:', error);
             throw error;

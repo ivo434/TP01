@@ -1,9 +1,6 @@
 import userRepository from "../repositories/user-repository.js";
 import pg from "pg";
 
-const client = new pg.Client();
-client.connect();
-
 class UserService {
     async verifiacionUsuario(username, password) {
         try {

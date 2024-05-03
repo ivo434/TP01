@@ -1,18 +1,15 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
 
-const client = new pg.Client(BDConfig);
-client.connect();
-
 export default class EventRepository{
-    // constructor(){
-    //     const { Client } = pkg;
-    //     this.DBClient = new Client(BDConfig)
-    //     this.DBClient.connect()
-    // }
-    getListadoEventos(limit, offset) {
+    constructor(){
+        const { Client } = pg;
+        this.DBClient = new Client(BDConfig)
+        this.DBClient.connect()
+    }
+    async getListadoEventos(limit, offset) {
         var query = `SELECT name, description, event_categories.name, event_locations.name, event_locations.full_address, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, users.first_name, users.last_name FROM events INNER JOIN event_locations ON events.id_event_location = event_locations.id INNER JOIN event_categories ON events.id_event_category = event_categories.id INNER JOIN users ON events.id_creator_user = users.id LIMIT ${limit} OFFSET ${offset}`;
-        const values = client.query(query);
+        const values = await client.query(query);
         return values;
     }
     busquedaEventos(name, category, startDate, tag, limit, offset) {
