@@ -1,5 +1,8 @@
-import pkg from "pg";
+import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
+
+const client = new pg.Client(BDConfig);
+client.connect();
 export default class ProvinceRepository {
     // constructor(){
     //     const { Client } = pkg;

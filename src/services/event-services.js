@@ -1,8 +1,4 @@
 import EventRepository from "../repositories/event-repository.js";
-import pg from "pg";
-
-const client = new pg.Client();
-client.connect();
 
 class EventService {
 
