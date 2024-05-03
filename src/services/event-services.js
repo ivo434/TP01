@@ -93,6 +93,7 @@ class EventService {
             throw error;
         }
     }
+    
 }
 
 export default EventService;
