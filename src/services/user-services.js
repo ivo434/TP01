@@ -1,7 +1,5 @@
-import userRepository from "../respositories/user-repository";
+import userRepository from "../repositories/user-repository.js";
 import pg from "pg";
-import { BDConfig } from '../BD/bd';
-import { query } from "express";
 
 const client = new pg.Client();
 client.connect();
@@ -24,3 +22,4 @@ class UserService {
         }
     }
 }
+export default UserService

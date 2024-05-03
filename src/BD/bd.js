@@ -1,7 +1,7 @@
 export const BDConfig = {
-    host: 'localhost',
+    host: process.env.BD_SERVER,
     port: 3000,
-    user: "root",
-    password: "root",
-    database: "DAI_Eventos",
+    user: process.env.BD_USER,
+    password: process.env.BD_PASSWORD,
+    database: process.env.BD_DATABASE,
 };

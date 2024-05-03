@@ -1,8 +1,5 @@
-import EventRepository from "../respositories/event-repository";
+import EventRepository from "../repositories/event-repository.js";
 import pg from "pg";
-import { config } from "dotenv";
-import { BDConfig } from '../BD/bd';
-import { query } from "express";
 
 const client = new pg.Client();
 client.connect();
@@ -93,7 +90,7 @@ class EventService {
             throw error;
         }
     }
-    
+
 }
 
 export default EventService;

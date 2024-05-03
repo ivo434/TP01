@@ -1,16 +1,12 @@
-import provinceRepository from "../respositories/province-repository";
+import ProvinceRepository from "../repositories/province-repository.js";
 import pg from "pg";
-import { BDConfig } from '../BD/bd';
-import { query } from "express";
 
 const client = new pg.Client();
 client.connect();
 
-import ProvinceRepository from './ProvinceRepository';
-
 class ProvinceService {
     constructor() {
-        this.provinceRepository = new ProvinceRepository();
+        this.ProvinceRepository = new ProvinceRepository();
     }
 
     async crearProvincia(name, full_name, latitude, longitude, display_order) {
@@ -25,7 +21,7 @@ class ProvinceService {
 
     async borrarProvincia(id) {
         try {
-            await this.provinceRepository.BorrarProvincia(id);
+            await this.ProvinceRepository.BorrarProvincia(id);
             return { message: 'Provincia borrada correctamente' };
         } catch (error) {
             console.error('Error in borrarProvincia:', error);
@@ -35,7 +31,7 @@ class ProvinceService {
 
     async editarProvincia(id, name, full_name, latitude, longitude, display_order) {
         try {
-            await this.provinceRepository.EditarProvincia(id, name, full_name, latitude, longitude, display_order);
+            await this.ProvinceRepository.EditarProvincia(id, name, full_name, latitude, longitude, display_order);
             return { message: 'Provincia actualizada correctamente?' };
         } catch (error) {
             console.error('Error in editarProvincia:', error);
@@ -45,7 +41,7 @@ class ProvinceService {
 
     async getAllProvincias(limit, offset) {
         try {
-            const provinces = await this.provinceRepository.GetAllProvincias(limit, offset);
+            const provinces = await this.ProvinceRepository.GetAllProvincias(limit, offset);
             return provinces;
         } catch (error) {
             console.error('Error in getAllProvincias:', error);
@@ -55,7 +51,7 @@ class ProvinceService {
 
     async getProvinciaById(id) {
         try {
-            const province = await this.provinceRepository.GetProvinciasById(id);
+            const province = await this.ProvinceRepository.GetProvinciasById(id);
             return province;
         } catch (error) {
             console.error('Error in getProvinciaById:', error);

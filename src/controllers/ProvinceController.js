@@ -2,12 +2,12 @@ import express from "express";
 import ProvinceService from "../services/province-services.js"
 const router = express.Router();
 
-const ProvinceService = new ProvinciasService();
+const provinceService = new ProvinceService();
 
 router.get('/:id', async (req, res) => {
   try {
     console.log(req.params.id)
-    const provincia = await ProvinceService.GetProvinciasById(req.params.id);
+    const provincia = await provinceService.GetProvinciasById(req.params.id);
     res.json(provincia);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -18,7 +18,7 @@ router.get('/:id', async (req, res) => {
 router.get('/', async (req, res) => {
   const {limit, offset} = req.body
   try {
-    const provincias = await ProvinceService.GetAllProvincias(limit, offset);
+    const provincias = await provinceService.GetAllProvincias(limit, offset);
     console.log(provincias);
     res.json(provincias);
   } catch (error) {
@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const {name, full_name, latitude, longitude, display_order} = req.body;
   try {
-    const provincia = await ProvinceService.CrearProvincia(name,full_name, latitude, longitude, display_order);
+    const provincia = await provinceService.CrearProvincia(name,full_name, latitude, longitude, display_order);
     res.status(201).json(provincia);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const provincia = await ProvinceService.BorrarProvincia(req.params.id);
+    const provincia = await provinceService.BorrarProvincia(req.params.id);
     res.status(200).json(provincia);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -50,7 +50,7 @@ router.put('/:id', async (req, res) => {
   const {id, name, full_name, latitude, longitude} = req.body
   console.log(id, name, full_name, latitude, longitude);
   try {
-    const provincia = await ProvinceService.EditarProvincia(id, name, full_name, latitude, longitude);
+    const provincia = await provinceService.EditarProvincia(id, name, full_name, latitude, longitude);
     res.status(200).json(provincia);
   } catch (error) {
     res.status(500).json({ message: error.message });

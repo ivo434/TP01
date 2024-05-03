@@ -1,9 +1,26 @@
+import pkg from "pg";
+import { BDConfig } from "../BD/bd.js";
+export default class ProvinceRepository {
+    // constructor(){
+    //     const { Client } = pkg;
+    //     this.DBClient = new Client(BDConfig)
+    //     this.DBClient.connect()
+    // }
+    async CrearProvincia(name, full_name, latitude, longitude, display_order){ // display_order >= 0 // query con trabajo en clase
+        try{
+            var query = 'INSERT INTO provinces(name, full_name, latitude, longitude, display_order) VALUES $1, $2, $3, $4, $5'; //cada $ equivale a un valor, de izquierda a derecha
+            const values = [name, full_name, latitude, longitude, display_order]
+            const result = await this.DBClient.query(sql, values)
 
-
-class ProvinceRepository {
-    CrearProvincia(name, full_name, latitude, longitude, display_order){ // display_order >= 0
-        var query = 'INSERT INTO provinces(name, full_name, latitude, longitude, display_order) VALUES ' + name + ', ' + full_name + ', ' + latitude + ', ' + longitude + ', ' + display_order;
-        const listQueryDB = query.execute(query);
+            if (result.rows.length > 0) {
+                returnEntity = result.rows[0];
+            } else {
+                //NT
+            }
+        }
+        catch{
+            console.error('Error in CrearProvincia');
+        }
         return {}
     }
     BorrarProvincia(id){
