@@ -51,9 +51,9 @@ router.post('/', async (req, res) => {
     try {
         const newEvent = await eventService.CrearEvento(...Object.values(eventData));
         if (newEvent > 0){
-            return res.status(200).json({'mensaje':'Se elimino el evento'});
+            return res.status(201).json({'mensaje':'Se elimino el evento'});
         }else{
-            return res.status(400).json({'mensaje':'no se elimino'});
+            return res.status(404).json({'mensaje':'no se elimino'});
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -68,7 +68,7 @@ router.delete('/:id', async (req, res) => {
         if (filas > 0){
             return res.status(200).json({mensaje:'Se elimino el evento'});
         }else{
-            return res.status(400).json({mensaje:'No se elimino'});
+            return res.status(404).json({mensaje:'No se elimino'});
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -80,9 +80,9 @@ router.put('/:id', async (req, res) => {
     const eventData = req.body;
     try {
         await eventService.EditarEvento(req.params.id, ...Object.values(eventData));
-        res.json({ message: 'Evento actualizado correctamente' });
+        res.status(200).json({ message: 'Evento actualizado correctamente' });
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(404).json({ error: 'Internal Server Error' });
     }
 });
 
@@ -97,7 +97,7 @@ router.post("/:id/enrollment", (req, res) => {
     }
     catch(error){
         console.log("Error al inscribir");
-        return res.json("Un Error");
+        return res.status(404).json("Un Error");
     }
 });
 
@@ -108,12 +108,13 @@ router.patch("/:id/enrollment", (req, res) => {
     }
     const {rating, descripcion, attended, observation} = req.body
     try {
+        
         const enrollment = eventService.patchEnrollment(rating, descripcion, attended, observation);
         return res.json(enrollment);
     }
     catch(error){
         console.log("Error al puntuar");
-        return res.json("Un Error");
+        return res.status(404).json("Un Error");
     }
 });
 
