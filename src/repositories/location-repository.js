@@ -1,7 +1,7 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
 
-export default class EventLocationRepository{
+export default class LocationRepository{
     constructor(){
         const { Client } = pg;
         this.DBClient = new Client(BDConfig)
