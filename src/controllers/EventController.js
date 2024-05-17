@@ -1,6 +1,6 @@
 import express from 'express';
 import EventService from '../services/event-services.js';
-
+import decryptToken from '../utils/token.js';
 const router = express.Router();
 const eventService = new EventService();
 
@@ -48,6 +48,8 @@ router.get('/:id/enrollment', async (req, res) => {
 
 router.post('/', async (req, res) => {
     const eventData = req.body;
+    const token = req.headers.authorization;
+    const payload = decryptToken(token);
     try {
         const newEvent = await eventService.CrearEvento(...Object.values(eventData));
         if (newEvent > 0){
@@ -62,9 +64,10 @@ router.post('/', async (req, res) => {
 
 
 router.delete('/:id', async (req, res) => {
-    const { id_creator_user } = req.body;
+    const token = req.headers.authorization;
+    const payload = decryptToken(token);
     try {
-        const filas = await eventService.BorrarEvento(req.params.id, id_creator_user);
+        const filas = await eventService.BorrarEvento(req.params.id, payload.id);
         if (filas > 0){
             return res.status(200).json({mensaje:'Se elimino el evento'});
         }else{
@@ -78,6 +81,8 @@ router.delete('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const eventData = req.body;
+    const token = req.headers.authorization;
+    const payload = decryptToken(token);
     try {
         await eventService.EditarEvento(req.params.id, ...Object.values(eventData));
         res.status(200).json({ message: 'Evento actualizado correctamente' });
