@@ -26,7 +26,7 @@ export default class ProvinceRepository {
     }
     async BorrarProvincia(id){
         var query = 'DELETE FROM provinces WHERE id = ' + id;
-        const listQueryDB = query.execute(query);
+        const listQueryDB = await client.query(query);
         return {}
     }
     async EditarProvincia(id, name, full_name, latitude, longitude, display_order){
@@ -50,17 +50,17 @@ export default class ProvinceRepository {
             query.substring(0,-1)
         }
         query += 'WHERE id = ' + id
-        const listQueryDB = query.execute(query);
+        const listQueryDB = await client.query(query);
         return query
     }
     async GetAllProvincias(){
         var query = 'SELECT * From provinces limit '  + limit + ' offset ' + offset
-        const listQueryDB = query.execute(query);
+        const listQueryDB = await client.query(query);
         return query
     }
     async GetProvinciasById(id){
         var query = 'SELECT * From provinces WHERE id = ' + id
-        const listQueryDB = query.execute(query);
+        const listQueryDB = await client.query(query);
         return query
     }
     async GetEventLocationByProvinceId(id_province, limit, offset){

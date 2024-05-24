@@ -12,7 +12,7 @@ export default class EventRepository{
         const values = await client.query(query);
         return values;
     }
-    busquedaEventos(name, category, startDate, tag, limit, offset) {
+    async busquedaEventos(name, category, startDate, tag, limit, offset) {
         var query = `SELECT name, event_categories.name, start_date, tags.name FROM events WHERE `;
         if (name != null) {
             query += `name = '${name}' AND `;
@@ -32,19 +32,19 @@ export default class EventRepository{
             query = query.slice(0, -7);
         }
         query += ` INNER JOIN event_categories ON events.id_event_category = event_categories.id INNER JOIN event_tags ON events.id = event_tags.id_event INNER JOIN tags ON event_tags.id_tag = tags.id LIMIT ${limit} OFFSET ${offset}`;
-        const values = client.query(query);
+        const values = await client.query(query);
         return values;
     }
 
-    detalleEventos(id) {
+    async detalleEventos(id) {
         var query = `SELECT * FROM events WHERE id = ${id} INNER JOIN event_locations ON id_event_location = event_locations.id INNER JOIN locations ON event_locations.id = locations.id INNER JOIN provinces ON locations.id = provinces.id`;
         // Execute the query, handle errors, and return result
-        const values = client.query(query);
+        const values = await client.query(query);
         return values; // Placeholder, handle errors and return result
     }
     
 
-    ListaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset){
+    async ListaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset){
         if (attended != true && attended != null || attended != false && attended != null) {
             return "Error"
         }
@@ -72,21 +72,22 @@ export default class EventRepository{
                 query = query.slice(0,-7);
             }
             query += ` LIMIT ${limit} OFFSET ${offset}`;
-            const values = client.query(query);
+            const values = await client.query(query);
         return values;
         }
     }
-    CrearEvento(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){ // display_order >= 0
-        var query = `INSERT INTO events (name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) VALUES ('${name}', '${description}', ${id_event_category}, ${id_event_location}, '${start_date}', ${duration_in_minutes}, ${price}, ${enabled_for_enrollment}, ${max_assistance}, ${id_creator_user})`;        const listQueryDB = query.execute(query);
-        const values = client.query(query);
+    async CrearEvento(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){ // display_order >= 0
+        var query = `INSERT INTO events (name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) VALUES ('${name}', '${description}', ${id_event_category}, ${id_event_location}, '${start_date}', ${duration_in_minutes}, ${price}, ${enabled_for_enrollment}, ${max_assistance}, ${id_creator_user})`;
+        const listQueryDB = query.execute(query);
+        const values = await client.query(query);
         return values;
     }
-    BorrarEvento(id, id_creator_user){
+    async BorrarEvento(id, id_creator_user){
         var query = `DELETE FROM events WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
-        const values = client.query(query);
+        const values = await client.query(query);
         return values;
     }
-    EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
+    async EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
         var query = 'UPDATE events SET'
         if (name != null) {
             query += ' name = ' + name + ', '
@@ -120,7 +121,7 @@ export default class EventRepository{
         }
         query += updates.join(', ') + ` WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
         const listQueryDB = query.execute(query);
-        const values = client.query(query);
+        const values = await client.query(query);
         return values;
     }
 }
