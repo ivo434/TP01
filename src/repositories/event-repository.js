@@ -18,13 +18,13 @@ export default class EventRepository{
             query += `name = '${name}' AND `;
         }
         if (category != null) {
-            query += 'category = ' + category + ' AND ';
+            query += `category = '${category}' AND `;
         }
         if (startDate != null) {
-            query += 'startDate = ' + startDate + ' AND ';
+            query += `startDate = '${startDate}' AND `;
         }
         if (tag != null) {
-            query += 'tag = ' + tag + ' AND ';
+            query += `tag = '${tag}' AND `;
         }
         if (query.endsWith(' AND ')) {
             query = query.slice(0, -5);
@@ -49,21 +49,21 @@ export default class EventRepository{
             return "Error"
         }
         else {
-            var query ='SELECT first_name, last_name, username FROM users WHERE event_enrollments.id_event = ' + id_event + ' INNER JOIN event_enrollments ON users.id = event_enrollments.id_user HAVING '
+            var query =`SELECT first_name, last_name, username FROM users WHERE event_enrollments.id_event = ${id_event} INNER JOIN event_enrollments ON users.id = event_enrollments.id_user HAVING `
             if (first_name != null) {
-                query += 'first_name = ' + first_name + ' AND '
+                query += `first_name = '${first_name}' AND `;
             }
             if (last_name != null) {
-                query += 'last_name = ' + last_name + ' AND '
+                query += `last_name = '${last_name}' AND `;
             }
             if (username != null) {
-                query += 'username = ' + username + ' AND '
+                query += `username = '${username}' AND `;
             }
             if (attended != null) {
-                query += 'attended = ' + attended + ' AND '
+                query += `attended = '${attended}' AND `;
             }
             if (rating != null) {
-                query += 'rating > ' + rating + ' AND ' //podría no estar el AND al final pero lo dejamos en caso de tener que añadir más en un futuro.
+                query += `rating > '${rating}' AND `; //podría no estar el AND al final pero lo dejamos en caso de tener que añadir más en un futuro.
             }
             if (query.endsWith(' AND ')) {
                 query = query.slice(0,-4);
@@ -90,31 +90,31 @@ export default class EventRepository{
     async EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
         var query = 'UPDATE events SET'
         if (name != null) {
-            query += ' name = ' + name + ', '
+            query += `name = '${name}', `;
         }
         if (description != null) {
-            query += ' description = ' + description + ', '
+            query += `description = '${description}', `;
         }
         if (id_event_category != null) {
-            query += ' id_event_category = ' + id_event_category + ', '
+            query += `id_event_category = '${id_event_category}', `;
         }
         if (id_event_location != null) {
-            query += ' id_event_location = ' + id_event_location + ', '
+            query += `id_event_location = '${id_event_location}', `;
         }
         if (start_date != null) {
-            query += ' start_date = ' + start_date + ', '
+            query += `start_date = '${start_date}', `;
         }
         if (duration_in_minutes != null) {
-            query += ' duration_in_minutes = ' + duration_in_minutes + ', '
+            query += `duration_in_minutes = '${duration_in_minutes}', `;
         }
         if (price != null) {
-            query += ' price = ' + price + ', '
+            query += `price = '${price}', `;
         }
         if (enabled_for_enrollment != null) {
-            query += ' enabled_for_enrollment = ' + enabled_for_enrollment + ', '
+            query += `enabled_for_enrollment = ${enabled_for_enrollment}, `;
         }
         if (max_assistance != null) {
-            query += ' max_assistance = ' + max_assistance
+            query += `max_assistance = '${max_assistance}', `;
         }
         if (query.endsWith(', ')){
             query.substring(0,-1)

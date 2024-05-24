@@ -25,41 +25,41 @@ export default class ProvinceRepository {
         return {}
     }
     async BorrarProvincia(id){
-        var query = 'DELETE FROM provinces WHERE id = ' + id;
+        var query = `DELETE FROM provinces WHERE id = ${id}`;
         const listQueryDB = await client.query(query);
         return {}
     }
     async EditarProvincia(id, name, full_name, latitude, longitude, display_order){
         var query = 'UPDATE provinces SET'
         if (name != null) {
-            query += ' name = ' + name + ', '
+            query += ` name = '${name}', `
         }
         if (full_name != null) {
-            query += ' full_name = ' + full_name + ', '
+            query += ` full_name = '${full_name}', `
         }
         if (latitude != null) {
-            query += ' latitude = ' + latitude + ', '
+            query += ` latitude = '${latitude}', `
         }
         if (longitude != null) {
-            query += ' longitude = ' + longitude + ', '
+            query += ` longitude = '${longitude}', `
         }
         if (display_order != null) {
-            query += ' display_order = ' + display_order
+            query += ` display_order = ${display_order}, `
         }
         if (query.endsWith(', ')){
             query.substring(0,-1)
         }
-        query += 'WHERE id = ' + id
+        query += `WHERE id = ${id}`
         const listQueryDB = await client.query(query);
         return query
     }
     async GetAllProvincias(){
-        var query = 'SELECT * From provinces limit '  + limit + ' offset ' + offset
+        var query = `SELECT * From provinces limit ${limit} offset ${offset}`
         const listQueryDB = await client.query(query);
         return query
     }
     async GetProvinciasById(id){
-        var query = 'SELECT * From provinces WHERE id = ' + id
+        var query = `SELECT * From provinces WHERE id = ${id}`
         const listQueryDB = await client.query(query);
         return query
     }
