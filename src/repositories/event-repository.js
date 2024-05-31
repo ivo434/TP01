@@ -12,6 +12,11 @@ export default class EventRepository{
         const values = await client.query(query);
         return values;
     }
+    async getEvento(id, limit, offset) {
+        var query = `SELECT name, description, event_categories.name, event_locations.name, event_locations.full_address, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, users.first_name, users.last_name FROM events INNER JOIN event_locations ON events.id_event_location = event_locations.id INNER JOIN event_categories ON events.id_event_category = event_categories.id INNER JOIN users ON events.id_creator_user = users.id WHERE id = ${id} LIMIT ${limit} OFFSET ${offset}`;
+        const values = await client.query(query);
+        return values;
+    }
     async busquedaEventos(name, category, startDate, tag, limit, offset) {
         var query = `SELECT name, event_categories.name, start_date, tags.name FROM events WHERE `;
         if (name != null) {
@@ -123,5 +128,41 @@ export default class EventRepository{
         const listQueryDB = query.execute(query);
         const values = await client.query(query);
         return values;
+    }
+    async enrollUserToEvent(eventEnrollment) {
+        const query = `
+            INSERT INTO event_enrollment (id_event, id_user, description, registration_date_time, attended, observations, rating)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `;
+        const values = [
+            eventEnrollment.id_event,
+            eventEnrollment.id_user,
+            eventEnrollment.description,
+            eventEnrollment.registration_date_time,
+            eventEnrollment.attended,
+            eventEnrollment.observations,
+            eventEnrollment.rating
+        ];
+        try {
+            await client.query(query, values);
+            console.log('Usuario inscrito exitosamente en el evento');
+        } catch (error) {
+            console.error('Error al inscribir al usuario en el evento', error.stack);
+            throw error;
+        }
+    } 
+    async removeUserFromEvent(eventEnrollmentId, userId) {
+        const query = `
+            DELETE FROM event_enrollment
+            WHERE id = $1 && id_user = $2
+        `;
+        const values = [eventEnrollmentId, userId];
+        try {
+            await client.query(query, values);
+            console.log('Usuario removido exitosamente del evento');
+        } catch (error) {
+            console.error('Error al remover al usuario del evento', error.stack);
+            throw error;
+        }
     }
 }

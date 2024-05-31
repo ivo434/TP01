@@ -1,6 +1,7 @@
 import express from 'express';
 import EventService from '../services/event-services.js';
 import decryptToken from '../utils/token.js';
+import EventEnrollment from '../entities/event-enrollments.js';
 const router = express.Router();
 const eventService = new EventService();
 
@@ -9,6 +10,17 @@ router.get('/', async (req, res) => {
     try {
         const events = await eventService.getListadoEventos(limit, offset);
         res.json(events);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+router.get('/:id', async (req, res) => {
+    const { limit, offset } = req.query;
+    try {
+        const events = await eventService.getEvento(req.params.id, limit, offset);
+        res.json(events);
+        return events;
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
@@ -91,20 +103,46 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-router.post("/:id/enrollment", (req, res) => {
+router.post('/:id/enrollment/', (req, res) => {
+    const fecha = new Date();
+    const { attended, observations, rating } = req.body
+    const token = req.headers.authorization;
+    const payload = decryptToken(token);
+    const userId = payload.id
+    const event = eventService.getEvento(req.params.id)
+    const newEventEnrollment = new EventEnrollment(
+        req.params.id,
+        userId,
+        event.description,
+        fecha,
+        attended,
+        observations,
+        rating
+    )
     try {
-        const event = eventService.postInscripcionEvento(req.params.id, req.body.id_user);
-        if(!event){
-            return res.status(400).json({ error: 'El formato de attended no es valido' });
-        } else{
-            return res.json("Se ha inscripto correctamente al evento");
+        const event = eventService.enrollUserToEvent(newEventEnrollment);
+        if (!event) {
+            return res.status(404).json({ error: 'Evento no encontrado' });
         }
-    }
-    catch(error){
-        console.log("Error al inscribir");
-        return res.status(404).json("Un Error");
+        res.status(201).json({ message: 'Usuario registrado exitosamente en el evento' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 });
+
+router.delete('/:id/enrollment/', (req, res) => {
+    const eventId = req.params.id;
+    const token = req.headers.authorization;
+    const payload = decryptToken(token);
+    const userId = payload.id
+    try {
+        eventService.removeUserFromEvent(eventId, userId);
+        res.status(200).json({ message: 'Usuario removido exitosamente del evento' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 
 
 router.patch("/:id/enrollment", (req, res) => {

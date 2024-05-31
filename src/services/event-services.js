@@ -10,6 +10,14 @@ class EventService {
             throw error;
         }
     }
+    async getEvento(id, limit, offset) {
+        try {
+            return await eventRepository.getEvento(id, limit, offset);
+        } catch (error) {
+            console.error('Error in getEvento:', error);
+            throw error;
+        }
+    }
 
     async busquedaEventos(name, category, startDate, tag, limit, offset) {
         try {
@@ -62,19 +70,19 @@ class EventService {
             throw error;
         }
     }
-    async patchEnrollment(rating, description, attended, observation, id_event, id_user){
-        const enrollment={
-          id_event: id_event,
-          id_user: id_user,
-          rating: rating,
-          observation: observation,
-          attended: attended,
-          description: description,
-        }
+    async enrollUserToEvent(eventEnrollment){
         try {
-            return await eventRepository.patchEnrollment(enrollment); // NO ESTA HECHO
+            return await eventRepository.enrollUserToEvent(eventEnrollment); // NO ESTA HECHO
         } catch (error) {
-            console.error('Error in patchEnrollment', error);
+            console.error('Error in enrollUserToEvent', error);
+            throw error;
+        }
+      }
+      async removeUserFromEvent(eventId, userId){
+        try {
+            await eventRepository.removeUserFromEvent(eventId, userId); // NO ESTA HECHO
+        } catch (error) {
+            console.error('Error in enrollUserToEvent', error);
             throw error;
         }
       }
