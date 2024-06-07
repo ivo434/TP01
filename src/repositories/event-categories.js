@@ -51,4 +51,14 @@ export default class EventCategoryRepository{
             throw error;
         }
     }
+    async DeleteCategory(id){
+        var query = `DELETE FROM event_categories WHERE id = ${id}`
+        try {
+            await client.query(query);
+            console.log('Categoria borrada exitosamente');
+        } catch (error) {
+            console.error('Error al borrar la categoria', error.stack);
+            throw error;
+        }
+    }   
 }
