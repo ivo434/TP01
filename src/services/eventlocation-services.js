@@ -1,5 +1,4 @@
 import EventLocationRepository from "../repositories/eventlocation-repository";
-import EventLocation from "../entities/event-location"
 const eventLocationRepository = new EventLocationRepository();
 export default class EventLocationService {
     async GetEventLocations(limit, offset){
