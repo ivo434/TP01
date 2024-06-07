@@ -125,9 +125,13 @@ export default class EventRepository{
             query.substring(0,-1)
         }
         query += updates.join(', ') + ` WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
-        const listQueryDB = query.execute(query);
-        const values = await client.query(query);
-        return values;
+        try {
+            await client.query(query);
+            console.log('Evento actualizado');
+        } catch (error) {
+            console.error('Error al actualizar el evento', error.stack);
+            throw error;
+        }
     }
     async enrollUserToEvent(eventEnrollment) {
         const query = `
