@@ -10,12 +10,12 @@ const app = express();
 app.use(express.json());
 const port = 3000;
 
-app.use("/event", EventController);
-app.use("/province", ProvinceController)
-app.use("/user", UserController)
-app.use("/location", LocationController)
-app.use("/event-location", EventLocationController)
-app.use("/event-category", EventCategoryController)
+app.use("/api/event", EventController);
+app.use("/api/province", ProvinceController)
+app.use("/api/user", UserController)
+app.use("/api/location", LocationController)
+app.use("/api/event-location", EventLocationController)
+app.use("/api/event-category", EventCategoryController)
 
 app.listen(port, ()  => 
 {console.log("Loaded")}

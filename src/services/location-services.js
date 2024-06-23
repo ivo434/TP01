@@ -1,4 +1,4 @@
-import LocationRepository from "../repositories/location-repository";;
+import LocationRepository from "../repositories/location-repository.js";
 const locationRepository = new LocationRepository();
 export default class LocationService {
     async GetAllLocations(limit, offset){

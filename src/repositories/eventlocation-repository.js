@@ -1,6 +1,6 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
-import EventLocation from "../entities/event-location"
+import EventLocation from "../entities/event-location.js"
 
 
 export default class EventLocationRepository{

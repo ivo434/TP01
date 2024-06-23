@@ -1,4 +1,4 @@
-import EventLocationRepository from "../repositories/eventlocation-repository";
+import EventLocationRepository from "../repositories/eventlocation-repository.js";
 const eventLocationRepository = new EventLocationRepository();
 export default class EventLocationService {
     async GetEventLocations(limit, offset){

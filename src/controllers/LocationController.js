@@ -1,5 +1,5 @@
 import express from 'express';
-import LocationService from '../services/location-services';;
+import LocationService from '../services/location-services.js';
 
 const router = express.Router();
 const locationService = new LocationService();

@@ -1,6 +1,6 @@
 import express from "express";
 import UserService from "../services/user-services.js"
-import { jwt } from "jsonwebtoken";
+import pkg from "jsonwebtoken";
 const router = express.Router();
 const userService = new UserService();
 
@@ -19,7 +19,7 @@ router.post("/login", (req, res) => {
             id: id,
             username: username,
         }
-        const token = jwt.sign(payload, process.env.TOKEN_PASSWORD, options)
+        const token = pkg.sign(payload, process.env.TOKEN_PASSWORD, options)
         console.log(token);
         return res.status(201).send({
             token: token
@@ -42,7 +42,7 @@ router.post("/register", (req, res) => {
             id: id,
             username: username,
         }
-        const token = jwt.sign(payload, process.env.TOKEN_PASSWORD, options)
+        const token = pkg.sign(payload, process.env.TOKEN_PASSWORD, options)
         console.log(token);
         return res.status(201).send({
             id: 0,

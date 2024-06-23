@@ -1,7 +1,7 @@
-export default class EventEnrollment{
-    constructor(id, name, display_order){
-        this.id = id,
-        this.name = name,
-        this.display_order = display_order
+export default class EventCategory{
+    constructor(EventCategoryid, name, display_order){
+        this.EventCategoryid = EventCategoryid,
+        this.EventCategoryname = name,
+        this.EventCategorydisplay_order = display_order
     }
 }

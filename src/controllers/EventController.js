@@ -2,17 +2,31 @@ import express from 'express';
 import EventService from '../services/event-services.js';
 import decryptToken from '../utils/token.js';
 import EventEnrollment from '../entities/event-enrollments.js';
+import { Pagination } from "../utils/paginacion.js";
+
 const router = express.Router();
 const eventService = new EventService();
+const pagination = new Pagination();
 
 router.get('/', async (req, res) => {
-    const { limit, offset } = req.query;
-    try {
-        const events = await eventService.getListadoEventos(limit, offset);
-        res.json(events);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+    let { limit, offset } = req.query;
+    limit = pagination.parseLimit(limit)
+    offset = pagination.parseOffset(offset)
+    const category = req.query.category
+    const startdate = req.query.startdate
+    const tag = req.query.tag
+    let name = req.query.name;
+    if (name){
+        name = name.trim()
     }
+        const events = await eventService.busquedaEventos(name, category, startdate, tag, limit, offset);
+        const total = await eventService.getListadoEventos(limit, offset);
+        const paginatedResponse = pagination.buildPaginationDto(limit, offset, total, req.path);
+        res.status(200).json({
+            eventos: events,
+            paginacion: paginatedResponse
+        });
+  
 });
 
 router.get('/:id', async (req, res) => {

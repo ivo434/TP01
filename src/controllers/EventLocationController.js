@@ -1,6 +1,6 @@
 import express from 'express';
-import EventLocationService from '../services/eventlocation-services';
-import decryptToken from '../utils/token';
+import EventLocationService from '../services/eventlocation-services.js';
+import decryptToken from '../utils/token.js';
 
 const router = express.Router();
 const eventLocationService = new EventLocationService();

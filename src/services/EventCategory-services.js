@@ -1,4 +1,4 @@
-import EventCategoryRepository from "../repositories/event-categories";;
+import EventCategoryRepository from "../repositories/event-categories.js";
 const eventCategoryRepository = new EventCategoryRepository();
 export default class EventCategoryService{
     async GetEventCategories(limit, offset){
