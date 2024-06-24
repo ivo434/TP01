@@ -11,8 +11,7 @@ class EventService {
     async getListadoEventos(limit, offset) {
     const basePath = "api/event"
         try {
-            const answer = await eventRepository.getListadoEventos(limit, offset)
-            return Mapping(limit, offset, basePath, answer)
+            return await eventRepository.getListadoEventos(limit, offset)
         } catch (error) {
             console.error('Error in getListadoEventos:', error);
             throw error;
@@ -20,8 +19,7 @@ class EventService {
     }
     async getEvento(id, limit, offset) {
         try {
-            const answer = await eventRepository.getEvento(id, limit, offset)
-            return Mapping(limit, offset, basePath, answer)
+            return await eventRepository.getEvento(id, limit, offset)
         } catch (error) {
             console.error('Error in getEvento:', error);
             throw error;
@@ -30,8 +28,7 @@ class EventService {
 
     async busquedaEventos(name, category, startDate, tag, limit, offset) {
         try {
-            const answer = await eventRepository.busquedaEventos(name, category, startDate, tag, limit, offset);
-            return Mapping(limit, offset, basePath, answer)
+            return await eventRepository.busquedaEventos(name, category, startDate, tag, limit, offset);
         } catch (error) {
             console.error('Error in busquedaEventos:', error);
             throw error;
@@ -50,7 +47,7 @@ class EventService {
         try {
             return await eventRepository.listaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset);
         } catch (error) {
-            console.error('Error in detalleEventos:', error);
+            console.error('Error in listaParticipantes:', error);
             throw error;
         }
     }
@@ -108,34 +105,3 @@ class EventService {
 }
 
 export default EventService;
-
-function Mapping(limit, offset, basePath, answer){
-    const totalCount = answer.length
-    const Result = answer.map(row =>{
-        var event = new Event(row.id, row.name, 
-            row.description, row.id_event_category, row.id_event_location, row.start_date, row.duration_in_minutes,
-            row.price, row.enabled_for_enrollment, row.max_assistance, row.id_creator_user);
-var eventcategory = new EventCategory(row.categoryid, row.categoryname, row.display_order);
-var eventlocation = new EventLocation(row.eventlocationid, row.eventlocationname, row.locationid, row.full_address,
-             row.max_capacity, row.eventlocationslatitude, row.eventlocationslongitude, row.creatoruserid);
-var location = new Location(row.locationid, row.locationname, row.provinceid, row.locationlatitude, row.locationlongitude);
-var province = new Province(row.provinceid, row.provincename, row.provincefullname, row.provincelatitude, row.provincelongitude, row.provincedisplayorder);
-var creatoruser = new User(row.creatoruserid, row.first_name, row.last_name, row.username, row.password);
-        return{
-            event: event,
-            creatoruser: creatoruser,
-            eventcategories: eventcategory,
-            eventlocations: eventlocation,
-            locations: location,
-            province: province,
-            creatoruser: creatoruser,
-            pagination: {
-                limit: limit,
-                offset: offset,
-                nextPage: ((offset + 1) * limit <= totalCount) ? `${process.env.BASE_URL}/${basePath}?limit=${limit}&offset=${offset + 1}` : null,
-                total: totalCount
-            }
-        }
-    })
-    return Result;
-}

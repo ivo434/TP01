@@ -9,115 +9,202 @@ console.log('config', BDConfig)
 
 export default class EventRepository{
     async getListadoEventos(limit, offset) {
-        var query = `select events.id, events.name, 
-        description, id_event_category, id_event_location, start_date, duration_in_minutes,
-        price, enabled_for_enrollment, max_assistance, events.id_creator_user, 
-        event_categories.id AS CategoryId,
-        event_categories.name AS CategoryName,
-        event_categories.display_order,
-        event_locations.id AS EventLocationId,  
-        event_locations.name AS EventLocationName,
-        full_address,
-        max_capacity, 
-        event_locations.latitude AS EventLocationsLatitude, 
-        event_locations.longitude AS EventLocationsLongitude,
-        locations.id AS LocationId, 
-        locations.name AS LocationName, 
-        locations.latitude AS LocationLatitude,
-        locations.longitude AS LocationLongitude,
-        provinces.id AS ProvinceId, 
-        provinces.name AS ProvinceName, 
-        provinces.full_name AS ProvinceFullName, 
-        provinces.latitude AS ProvinceLatitude, 
-        provinces.longitude AS ProvinceLongitude, 
-        provinces.display_order AS ProvinceDisplayOrder,
-        users.id AS CreatorUserId, 
-        first_name, 
-        last_name, 
-        username, 
-        password
-            FROM events
-        INNER JOIN users ON events.id_creator_user = users.id
-        INNER JOIN event_categories ON events.id_event_category = event_categories.id
-        INNER JOIN event_locations ON events.id_event_location = event_locations.id
-        INNER JOIN locations ON event_locations.id_location = locations.id
-        INNER JOIN provinces ON locations.id_province = provinces.id`;
+        var query = `SELECT 
+        events.id,
+        events.name,
+        description,
+        id_event_category,
+        id_event_location,
+        start_date,
+        duration_in_minutes,
+        price,
+        enabled_for_enrollment,
+        max_assistance,
+        events.id_creator_user,
+        json_build_object(
+            'id', event_categories.id,
+            'name', event_categories.name,
+            'display_order', event_categories.display_order
+        ) AS event_category,
+        json_build_object(
+            'id', event_locations.id,
+            'name', event_locations.name,
+            'full_address', full_address,
+            'max_capacity', max_capacity,
+            'latitude', event_locations.latitude,
+            'longitude', event_locations.longitude
+        ) AS event_location,
+        json_build_object(
+            'id', locations.id,
+            'name', locations.name,
+            'latitude', locations.latitude,
+            'longitude', locations.longitude
+        ) AS location,
+        json_build_object(
+            'id', provinces.id,
+            'name', provinces.name,
+            'full_name', provinces.full_name,
+            'latitude', provinces.latitude,
+            'longitude', provinces.longitude,
+            'display_order', provinces.display_order
+        ) AS province,
+        json_build_object(
+            'id', users.id,
+            'first_name', first_name,
+            'last_name', last_name,
+            'username', username,
+            'password', password
+        ) AS creator_user,
+        array(
+            SELECT
+                json_build_object(
+                    'id', tags.id,
+                    'name', tags.name
+                ) 
+            FROM tags
+            INNER JOIN event_tags ON tags.id = event_tags.id_tag
+            WHERE event_tags.id_event = events.id
+            ) AS tags
+    FROM events
+    INNER JOIN users ON events.id_creator_user = users.id
+    INNER JOIN event_categories ON events.id_event_category = event_categories.id
+    INNER JOIN event_locations ON events.id_event_location = event_locations.id
+    INNER JOIN locations ON event_locations.id_location = locations.id
+    INNER JOIN provinces ON locations.id_province = provinces.id`;
         query += ` LIMIT ${limit} OFFSET ${offset}`
         const {rows} = await client.query(query);
         return rows;
     }
     async getEvento(id, limit, offset) {
-        var query = `select events.id, events.name, 
-        description, id_event_category, id_event_location, start_date, duration_in_minutes,
-        price, enabled_for_enrollment, max_assistance, events.id_creator_user, 
-        event_categories.id AS CategoryId,
-        event_categories.name AS CategoryName,
-        event_categories.display_order,
-        event_locations.id AS EventLocationId,  
-        event_locations.name AS EventLocationName,
-        full_address,
-        max_capacity, 
-        event_locations.latitude AS EventLocationsLatitude, 
-        event_locations.longitude AS EventLocationsLongitude,
-        locations.id AS LocationId, 
-        locations.name AS LocationName, 
-        locations.latitude AS LocationLatitude,
-        locations.longitude AS LocationLongitude,
-        provinces.id AS ProvinceId, 
-        provinces.name AS ProvinceName, 
-        provinces.full_name AS ProvinceFullName, 
-        provinces.latitude AS ProvinceLatitude, 
-        provinces.longitude AS ProvinceLongitude, 
-        provinces.display_order AS ProvinceDisplayOrder,
-        users.id AS CreatorUserId, 
-        first_name, 
-        last_name, 
-        username, 
-        password
-            FROM events
-        INNER JOIN users ON events.id_creator_user = users.id
-        INNER JOIN event_categories ON events.id_event_category = event_categories.id
-        INNER JOIN event_locations ON events.id_event_location = event_locations.id
-        INNER JOIN locations ON event_locations.id_location = locations.id
-        INNER JOIN provinces ON locations.id_province = provinces.id
+        var query = `SELECT 
+        events.id,
+        events.name,
+        description,
+        id_event_category,
+        id_event_location,
+        start_date,
+        duration_in_minutes,
+        price,
+        enabled_for_enrollment,
+        max_assistance,
+        events.id_creator_user,
+        json_build_object(
+            'id', event_categories.id,
+            'name', event_categories.name,
+            'display_order', event_categories.display_order
+        ) AS event_category,
+        json_build_object(
+            'id', event_locations.id,
+            'name', event_locations.name,
+            'full_address', full_address,
+            'max_capacity', max_capacity,
+            'latitude', event_locations.latitude,
+            'longitude', event_locations.longitude
+        ) AS event_location,
+        json_build_object(
+            'id', locations.id,
+            'name', locations.name,
+            'latitude', locations.latitude,
+            'longitude', locations.longitude
+        ) AS location,
+        json_build_object(
+            'id', provinces.id,
+            'name', provinces.name,
+            'full_name', provinces.full_name,
+            'latitude', provinces.latitude,
+            'longitude', provinces.longitude,
+            'display_order', provinces.display_order
+        ) AS province,
+        json_build_object(
+            'id', users.id,
+            'first_name', first_name,
+            'last_name', last_name,
+            'username', username,
+            'password', password
+        ) AS creator_user,
+        array(
+            SELECT
+                json_build_object(
+                    'id', tags.id,
+                    'name', tags.name
+                ) 
+            FROM tags
+            INNER JOIN event_tags ON tags.id = event_tags.id_tag
+            WHERE event_tags.id_event = events.id
+            ) AS tags
+    FROM events
+    INNER JOIN users ON events.id_creator_user = users.id
+    INNER JOIN event_categories ON events.id_event_category = event_categories.id
+    INNER JOIN event_locations ON events.id_event_location = event_locations.id
+    INNER JOIN locations ON event_locations.id_location = locations.id
+    INNER JOIN provinces ON locations.id_province = provinces.id
         WHERE events.id = ${id}`;
         const {rows} = await client.query(query);
         return rows;
     }
     async busquedaEventos(name, category, startdate, tag, limit, offset) {
-        var query = `select events.id, events.name, 
-        description, id_event_category, id_event_location, start_date, duration_in_minutes,
-        price, enabled_for_enrollment, max_assistance, events.id_creator_user, 
-        event_categories.id AS CategoryId,
-        event_categories.name AS CategoryName,
-        event_categories.display_order,
-        event_locations.id AS EventLocationId,  
-        event_locations.name AS EventLocationName,
-        full_address,
-        max_capacity, 
-        event_locations.latitude AS EventLocationsLatitude, 
-        event_locations.longitude AS EventLocationsLongitude,
-        locations.id AS LocationId, 
-        locations.name AS LocationName, 
-        locations.latitude AS LocationLatitude,
-        locations.longitude AS LocationLongitude,
-        provinces.id AS ProvinceId, 
-        provinces.name AS ProvinceName, 
-        provinces.full_name AS ProvinceFullName, 
-        provinces.latitude AS ProvinceLatitude, 
-        provinces.longitude AS ProvinceLongitude, 
-        provinces.display_order AS ProvinceDisplayOrder,
-        users.id AS CreatorUserId, 
-        first_name, 
-        last_name, 
-        username, 
-        password
-            FROM events
-        INNER JOIN users ON events.id_creator_user = users.id
-        INNER JOIN event_categories ON events.id_event_category = event_categories.id
-        INNER JOIN event_locations ON events.id_event_location = event_locations.id
-        INNER JOIN locations ON event_locations.id_location = locations.id
-        INNER JOIN provinces ON locations.id_province = provinces.id
+        var query = `SELECT 
+        events.id,
+        events.name,
+        description,
+        id_event_category,
+        id_event_location,
+        start_date,
+        duration_in_minutes,
+        price,
+        enabled_for_enrollment,
+        max_assistance,
+        events.id_creator_user,
+        json_build_object(
+            'id', event_categories.id,
+            'name', event_categories.name,
+            'display_order', event_categories.display_order
+        ) AS event_category,
+        json_build_object(
+            'id', event_locations.id,
+            'name', event_locations.name,
+            'full_address', full_address,
+            'max_capacity', max_capacity,
+            'latitude', event_locations.latitude,
+            'longitude', event_locations.longitude
+        ) AS event_location,
+        json_build_object(
+            'id', locations.id,
+            'name', locations.name,
+            'latitude', locations.latitude,
+            'longitude', locations.longitude
+        ) AS location,
+        json_build_object(
+            'id', provinces.id,
+            'name', provinces.name,
+            'full_name', provinces.full_name,
+            'latitude', provinces.latitude,
+            'longitude', provinces.longitude,
+            'display_order', provinces.display_order
+        ) AS province,
+        json_build_object(
+            'id', users.id,
+            'first_name', first_name,
+            'last_name', last_name,
+            'username', username,
+            'password', password
+        ) AS creator_user,
+        array(
+            SELECT
+                json_build_object(
+                    'id', tags.id,
+                    'name', tags.name
+                ) 
+            FROM tags
+            INNER JOIN event_tags ON tags.id = event_tags.id_tag
+            WHERE event_tags.id_event = events.id
+            ) AS tags
+    FROM events
+    INNER JOIN users ON events.id_creator_user = users.id
+    INNER JOIN event_categories ON events.id_event_category = event_categories.id
+    INNER JOIN event_locations ON events.id_event_location = event_locations.id
+    INNER JOIN locations ON event_locations.id_location = locations.id
+    INNER JOIN provinces ON locations.id_province = provinces.id
         WHERE `;
         if (name != null) {
             query += `events.name ILIKE '%${name}%' AND `;
@@ -142,23 +229,36 @@ export default class EventRepository{
         return rows;
     }
     
-    async ListaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset){
-        if (attended != true && attended != null || attended != false && attended != null) {
-            return "Error"
-        }
-        else {
-            var query =`SELECT first_name, last_name, username FROM users 
-            WHERE event_enrollments.id_event = ${id_event} 
-            INNER JOIN event_enrollments 
-            ON users.id = event_enrollments.id_user HAVING `
+    async listaParticipantes(id_event, first_name, last_name, username, attended, rating, limit, offset){
+            var query =`SELECT
+            ee.id,
+            ee.id_event,
+            ee.id_user,
+            json_build_object(
+                'id', u.id,
+                'first_name', u.first_name,
+                'last_name', u.last_name,
+                'username', u.username,
+                'password', u.password
+            ) AS user,
+            ee.description,
+            ee.registration_date_time,
+            ee.attended,
+            ee.observations,
+            ee.rating
+            FROM
+            event_enrollments ee
+            INNER JOIN users u
+			ON U.id = ee.id_user
+            WHERE ee.id_event = ${id_event} AND `
             if (first_name != null) {
-                query += `first_name = '${first_name}' AND `;
+                query += `first_name ILIKE '%${first_name}%' AND `;
             }
             if (last_name != null) {
-                query += `last_name = '${last_name}' AND `;
+                query += `last_name ILIKE '%${last_name}%' AND `;
             }
             if (username != null) {
-                query += `username = '${username}' AND `;
+                query += `username ILIKE '%${username}%' AND `;
             }
             if (attended != null) {
                 query += `attended = '${attended}' AND `;
@@ -169,13 +269,9 @@ export default class EventRepository{
             if (query.endsWith(' AND ')) {
                 query = query.slice(0,-4);
             }
-            else if (query.endsWith(' HAVING ')) {
-                query = query.slice(0,-7);
-            }
-            query += ` LIMIT ${limit} OFFSET ${offset}`;
-            const values = await client.query(query);
-        return values;
-        }
+            console.log(query)
+            const {rows} = await client.query(query);
+            return rows;
     }
     async CrearEvento(name, description, id_event_category, id_event_location, start_date, 
         duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){ // display_order >= 0

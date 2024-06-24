@@ -1,13 +1,39 @@
 import pkg from "jsonwebtoken";
+import "dotenv/config"
 
-export default async function decryptToken(token){
-    token = token.split(' ')[1];
+export const createToken = (user) => {
+    const payload = {
+        id: user[0].id,
+        username: user[0].username
+    };
+    const secretKey = process.env.TOKEN_PASSWORD;
+    const options = {
+        expiresIn : '1h',
+        issuer : 'localhost'
+    };
+
+    return pkg.sign(payload,secretKey,options);
+}
+
+export const desencryptToken = (encryptedToken) => {
+    const secretKey = process.env.TOKEN_PASSWORD;
+    let token = encryptedToken;
     let payloadOriginal = null;
     try {
-        payloadOriginal = await pkg.verify(token, process.env.TOKEN_PASSWORD)
-    } catch (error){
-        console.log(error)
+        payloadOriginal = pkg.verify(token, secretKey);
+    } catch(e) {
+        console.error(e);
     }
-    console.log(payloadOriginal)
     return payloadOriginal;
+};
+
+export function AuthMiddleware(req, res, next) {
+    if(!req.headers.authorization){
+        return res.status(401).send("Unauthorized");
+    } else{
+        const token = req.headers.authorization.split(" ")[1];
+        const decryptToken = desencryptToken(token);
+        req.user = decryptToken;
+    }
+    next();
 }

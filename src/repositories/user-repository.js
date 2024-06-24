@@ -8,9 +8,21 @@ export default class UserRepository {
         this.DBClient.connect()
     }
     async LoginUsuario(username, password){
-        var query = `SELECT id, username FROM Usuarios WHERE username = ${username} && password = ${password}`
-        const values = await client.query(query);
-        return values;
+        try{
+            var query = `SELECT id, username FROM Usuarios WHERE username = ${username} && password = ${password}`
+            const {rows} = await client.query(query);
+            if(rows != null){
+                const token = createToken(respuesta.rows);
+                console.log(token);
+                return token;
+            }
+            else{
+                return false;
+            }
+        } catch (error){
+            console.log(error);
+        }
+        
     }
     async RegisterUsuario(first_name, last_name, username, password){
         if (first_name != null && last_name != null && first_name < 3 && last_name < 3 && emailCheck(username) && password != null && password < 3) {

@@ -33,7 +33,7 @@ router.get('/:id', async (req, res) => {
     const { limit, offset } = req.query;
     try {
         const events = await eventService.getEvento(req.params.id, limit, offset);
-        res.json(events);
+        res.status(200).json(events);
         return events;
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -45,7 +45,7 @@ router.get('/', async (req, res) => {
     const { name, category, startDate, tag, limit, offset } = req.query;
     try {
         const events = await eventService.busquedaEventos(name, category, startDate, tag, limit, offset);
-        res.json(events);
+        res.status(200).json(events);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
@@ -55,17 +55,17 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const event = await eventService.detalleEventos(req.params.id);
-        res.json(event);
+        res.status(200).json(event);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 router.get('/:id/enrollment', async (req, res) => {
-    const {first_name, last_name, username, attended, rating, limit, offset } = req.query;
+    const {first_name, last_name, username, attended, rating } = req.query;
     try {
-        const event = await eventService.detalleEventos(req.params.id, first_name, last_name, username, attended, rating, limit, offset);
-        res.json(event);
+        const participantes = await eventService.listaParticipantes(req.params.id, first_name, last_name, username, attended, rating);
+        res.status(200).json(participantes);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
