@@ -8,7 +8,7 @@ router.get('/:id', async (req, res) => {
   try {
     console.log(req.params.id)
     const provincia = await provinceService.GetProvinciasById(req.params.id);
-    res.json(provincia);
+    res.status(200).json(provincia);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -21,8 +21,11 @@ router.get('/', async (req, res) => {
   offset = pagination.parseOffset(offset)
   try {
     const provincias = await provinceService.GetAllProvincias(limit, offset);
-    console.log(provincias);
-    res.json(provincias);
+    const paginatedResponse = pagination.buildPaginationDto(limit, offset, provincias, req.path);
+        res.status(200).json({
+            provincias: provincias,
+            paginacion: paginatedResponse
+        });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
