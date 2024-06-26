@@ -7,3 +7,5 @@ export const BDConfig = {
     password: process.env.BD_PASSWORD,
     database: process.env.BD_DATABASE,
 };
+
+//hola drakey, si ves esto te hago acordar que TENES QUE PONER TRY CATCH EN TODO. denada

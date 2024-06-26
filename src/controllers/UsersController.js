@@ -10,36 +10,50 @@ const options = {
 
 router.post("/login", (req, res) => {
     const { username, password } = req.body;
-    const verificadorUsuario = userService.verificarUsuario(username, password);
-    if (verificadorUsuario != false) {
-        return res.status(200).send({
-            success: true,
-            message: "User Founded",
-            token: token
-        });   
-    } else if (verificadorUsuario == false) {
-        return res.status(401).send({
+    const verif = verificacionLogin(username);
+    if (!verif) {
+        return res.status(400).send({
             success: false,
-            message: "Username or password invalid",
-            token: ""
+            message: "El email es invalido.",
+            token  : ""
         });
-    } else {
-        res.status(500).json({ error: 'Internal Server Error' });
+    }
+    else {
+        try{
+            const verificadorUsuario = userService.verificacionUsuario(username, password);
+            if (verificadorUsuario != null) {
+                return res.status(200).send({
+                    success: true,
+                    message: "User Founded",
+                    token: verificadorUsuario
+                });   
+            } else {
+                return res.status(400).send({
+                    success: false,
+                    message: "Usuario o clave inválida.",
+                    token: ""
+                });
+            }
+        } catch (error){
+            res.status(500).send({
+                message:"Internal server error"
+            })
+        }
     }
 });
 
 router.post("/register", (req, res) => {
     const { first_name, last_name, username, password } = req.body;
-    const crearUsuario = userService.crearUsuario(first_name, last_name, username, password);
-    if(crearUsuario = true){
+    const checkIn = verificadorDeRegistro(first_name, last_name, username, password);
+    if(checkIn = true){
+        const id = userService.crearUsuario(first_name, last_name, username, password)
         const payload = {
             id: id,
             username: username,
         }
         const token = pkg.sign(payload, process.env.TOKEN_PASSWORD, options)
-        console.log(token);
         return res.status(201).send({
-            id: 0,
+            id: id,
             first_name: first_name,
             last_name: last_name,
             username: username,
@@ -68,5 +82,13 @@ const verificadorDeRegistro = (first_name, last_name, username, password) => {
         return true;
     }
 }
-
+const verificacionLogin = (username) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!regex.test(username)){
+        return "El formato de correo electrónico no es válido";
+    }
+    else{
+        return true;
+    }
+}
 export default router;

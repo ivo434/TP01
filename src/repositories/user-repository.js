@@ -17,7 +17,7 @@ export default class UserRepository {
                 return token;
             }
             else{
-                return false;
+                return null;
             }
         } catch (error){
             console.log(error);
@@ -25,23 +25,13 @@ export default class UserRepository {
         
     }
     async RegisterUsuario(first_name, last_name, username, password){
-        if (first_name != null && last_name != null && first_name < 3 && last_name < 3 && emailCheck(username) && password != null && password < 3) {
-            var query = `INSERT INTO Usuarios (first_name, last_name, username, password) VALUES ('${first_name}', '${last_name}', '${username}', '${password}')`
-            const values = await client.query(query);
-            return values;
-        }
-        else {
-            return error;
+        try{
+            var query = `INSERT INTO Usuarios (first_name, last_name, username, password) VALUES ('${first_name}', '${last_name}', '${username}', '${password}') RETURNING id`
+            const value = await client.query(query);
+            const insertedId = value.rows[0].id;
+            return insertedId;
+        } catch (error){
+            console.log(error);
         }
     }
-}
-function emailCheck(emailField){
-    var validEmail =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
-    if( validEmail.test(emailField) ){
-		alert('Username is valid, continue with form submission');
-		return true;
-	}else{
-		alert('Username is invalid, skip form submission');
-		return false;
-	}
 }
