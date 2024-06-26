@@ -1,6 +1,6 @@
 import express from 'express';
 import EventService from '../services/event-services.js';
-import decryptToken from '../utils/token.js';
+import {decryptToken} from '../utils/token.js';
 import EventEnrollment from '../entities/event-enrollments.js';
 import { Pagination } from "../utils/paginacion.js";
 

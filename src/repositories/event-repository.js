@@ -1,11 +1,9 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
 
-
 const client = new pg.Client(BDConfig);
-
 client.connect();
-console.log('config', BDConfig)
+
 
 export default class EventRepository{
     async getListadoEventos(limit, offset) {

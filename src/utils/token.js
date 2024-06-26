@@ -15,7 +15,7 @@ export const createToken = (user) => {
     return pkg.sign(payload,secretKey,options);
 }
 
-export const desencryptToken = (encryptedToken) => {
+export const decryptToken = (encryptedToken) => {
     const secretKey = process.env.TOKEN_PASSWORD;
     let token = encryptedToken;
     let payloadOriginal = null;

@@ -1,10 +1,11 @@
-import userRepository from "../repositories/user-repository.js";
-import pg from "pg";
+import UserRepository from "../repositories/user-repository.js";
+const userRepository = new UserRepository()
 
 class UserService {
-    async verifiacionUsuario(username, password) {
+    async verificacionUsuario(username, password) {
         try {
-            return await userRepository.LoginUsuario(username, password);
+            const token = await userRepository.LoginUsuario(username, password);
+            return token;
         } catch (error) {
             console.error('Error in verificacionUsuario:', error);
             throw error;
@@ -12,7 +13,7 @@ class UserService {
     }
     async crearUsuario(first_name, last_name, username, password) {
         try {
-            return await userRepository.registerUsuario(first_name, last_name, username, password);
+            return await userRepository.RegisterUsuario(first_name, last_name, username, password);
         } catch (error) {
             console.error('Error in crearUsuario:', error);
             throw error;

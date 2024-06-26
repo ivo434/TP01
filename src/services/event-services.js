@@ -1,10 +1,4 @@
 import EventRepository from "../repositories/event-repository.js";
-import Event from "../entities/event.js";
-import EventLocation from "../entities/event-location.js";
-import EventCategory from "../entities/event-categories.js";
-import User from "../entities/user.js";
-import Province from "../entities/province.js";
-import Location from "../entities/location.js";
 const eventRepository = new EventRepository();
 class EventService {
 

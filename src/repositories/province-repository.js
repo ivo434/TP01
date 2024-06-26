@@ -1,17 +1,16 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
 
+const client = new pg.Client(BDConfig);
+client.connect();
+
+
 export default class ProvinceRepository {
-    constructor(){
-        const { Client } = pg;
-        this.DBClient = new Client(BDConfig)
-        this.DBClient.connect()
-    }
     async CrearProvincia(name, full_name, latitude, longitude, display_order){ // display_order >= 0 // query con trabajo en clase
         try{
             var query = 'INSERT INTO provinces(name, full_name, latitude, longitude, display_order) VALUES $1, $2, $3, $4, $5'; //cada $ equivale a un valor, de izquierda a derecha
             const values = [name, full_name, latitude, longitude, display_order]
-            const result = await this.DBClient.query(sql, values)
+            const result = await client.query(sql, values)
 
             if (result.rows.length > 0) {
                 returnEntity = result.rows[0];
@@ -26,8 +25,7 @@ export default class ProvinceRepository {
     }
     async BorrarProvincia(id){
         var query = `DELETE FROM provinces WHERE id = ${id}`;
-        const listQueryDB = await client.query(query);
-        return {}
+        return await client.query(query);
     }
     async EditarProvincia(id, name, full_name, latitude, longitude, display_order){
         var query = 'UPDATE provinces SET'
@@ -50,13 +48,11 @@ export default class ProvinceRepository {
             query.substring(0,-1)
         }
         query += `WHERE id = ${id}`
-        const listQueryDB = await client.query(query);
-        return query
+        return await client.query(query);
     }
     async GetAllProvincias(){
         var query = `SELECT * From provinces limit ${limit} offset ${offset}`
-        const listQueryDB = await client.query(query);
-        return query
+        return await client.query(query);
     }
     async GetProvinciasById(id){
         var query = `SELECT * From provinces WHERE id = ${id}`

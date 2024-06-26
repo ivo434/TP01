@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 import UserService from "../services/user-services.js"
 import pkg from "jsonwebtoken";
 const router = express.Router();
@@ -8,7 +8,7 @@ const options = {
     issuer : 'organizacion'
 }
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const verif = verificacionLogin(username);
     if (!verif) {
@@ -20,12 +20,13 @@ router.post("/login", (req, res) => {
     }
     else {
         try{
-            const verificadorUsuario = userService.verificacionUsuario(username, password);
-            if (verificadorUsuario != null) {
+            const token = await userService.verificacionUsuario(username, password);
+            console.log(token)
+            if (token != null) {
                 return res.status(200).send({
                     success: true,
                     message: "User Founded",
-                    token: verificadorUsuario
+                    token: token
                 });   
             } else {
                 return res.status(400).send({
@@ -42,11 +43,11 @@ router.post("/login", (req, res) => {
     }
 });
 
-router.post("/register", (req, res) => {
+router.post("/register", async (req, res) => {
     const { first_name, last_name, username, password } = req.body;
     const checkIn = verificadorDeRegistro(first_name, last_name, username, password);
-    if(checkIn = true){
-        const id = userService.crearUsuario(first_name, last_name, username, password)
+    if(checkIn){
+        const id = await userService.crearUsuario(first_name, last_name, username, password)
         const payload = {
             id: id,
             username: username,

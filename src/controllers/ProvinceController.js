@@ -16,7 +16,9 @@ router.get('/:id', async (req, res) => {
 
 // Obtener todas las provincias con paginación
 router.get('/', async (req, res) => {
-  const {limit, offset} = req.body
+  let { limit, offset } = req.query;
+  limit = pagination.parseLimit(limit)
+  offset = pagination.parseOffset(offset)
   try {
     const provincias = await provinceService.GetAllProvincias(limit, offset);
     console.log(provincias);
