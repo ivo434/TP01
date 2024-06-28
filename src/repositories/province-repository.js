@@ -11,11 +11,8 @@ export default class ProvinceRepository {
             var query = 'INSERT INTO provinces(name, full_name, latitude, longitude, display_order) VALUES $1, $2, $3, $4, $5'; //cada $ equivale a un valor, de izquierda a derecha
             const values = [name, full_name, latitude, longitude, display_order]
             const result = await client.query(sql, values)
-
             if (result.rows.length > 0) {
                 returnEntity = result.rows[0];
-            } else {
-                //NT
             }
         }
         catch{
@@ -50,18 +47,19 @@ export default class ProvinceRepository {
         query += `WHERE id = ${id}`
         return await client.query(query);
     }
-    async GetAllProvincias(){
+    async GetAllProvincias(limit, offset){
         var query = `SELECT * From provinces limit ${limit} offset ${offset}`
-        return await client.query(query);
+        const {rows} =  await client.query(query);
+        return rows
     }
-    async GetProvinciasById(id){
+    async GetProvinciaById(id){
         var query = `SELECT * From provinces WHERE id = ${id}`
-        const listQueryDB = await client.query(query);
-        return query
+        const {rows} =  await client.query(query);
+        return rows
     }
     async GetEventLocationByProvinceId(id_province, limit, offset){
         var query = `SELECT id, id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user FROM event_locations WHERE locations.id_province = ${id_province} INNER JOIN locations ON event_locations.id_location = locations.id limit ${limit} offset ${offset}`;
-        const values = await client.query(query);
-        return values;
+        const {rows} =  await client.query(query);
+        return rows
     }
 }

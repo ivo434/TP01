@@ -1,11 +1,12 @@
 import ProvinceRepository from "../repositories/province-repository.js";
 import pg from "pg";
+const provinceRepository = new ProvinceRepository();
 
 class ProvinceService {
 
-    async crearProvincia(name, full_name, latitude, longitude, display_order) {
+    async CrearProvincia(name, full_name, latitude, longitude, display_order) {
         try {
-            await this.provinceRepository.CrearProvincia(name, full_name, latitude, longitude, display_order);
+            await provinceRepository.CrearProvincia(name, full_name, latitude, longitude, display_order);
             return { message: 'Provincia creada correctamente' };
         } catch (error) {
             console.error('Error in crearProvincia:', error);
@@ -13,9 +14,9 @@ class ProvinceService {
         }
     }
 
-    async borrarProvincia(id) {
+    async BorrarProvincia(id) {
         try {
-            await this.ProvinceRepository.BorrarProvincia(id);
+            await provinceRepository.BorrarProvincia(id);
             return { message: 'Provincia borrada correctamente' };
         } catch (error) {
             console.error('Error in borrarProvincia:', error);
@@ -23,9 +24,9 @@ class ProvinceService {
         }
     }
 
-    async editarProvincia(id, name, full_name, latitude, longitude, display_order) {
+    async EditarProvincia(id, name, full_name, latitude, longitude, display_order) {
         try {
-            await this.ProvinceRepository.EditarProvincia(id, name, full_name, latitude, longitude, display_order);
+            await provinceRepository.EditarProvincia(id, name, full_name, latitude, longitude, display_order);
             return { message: 'Provincia actualizada correctamente?' };
         } catch (error) {
             console.error('Error in editarProvincia:', error);
@@ -33,9 +34,9 @@ class ProvinceService {
         }
     }
 
-    async getAllProvincias(limit, offset) {
+    async GetAllProvincias(limit, offset) {
         try {
-            const provinces = await this.ProvinceRepository.GetAllProvincias(limit, offset);
+            const provinces = await provinceRepository.GetAllProvincias(limit, offset);
             return provinces;
         } catch (error) {
             console.error('Error in getAllProvincias:', error);
@@ -43,9 +44,9 @@ class ProvinceService {
         }
     }
 
-    async getProvinciaById(id) {
+    async GetProvinciaById(id) {
         try {
-            const province = await this.ProvinceRepository.GetProvinciasById(id);
+            const province = await provinceRepository.GetProvinciaById(id);
             return province;
         } catch (error) {
             console.error('Error in getProvinciaById:', error);
