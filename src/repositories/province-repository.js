@@ -7,18 +7,14 @@ client.connect();
 
 export default class ProvinceRepository {
     async CrearProvincia(name, full_name, latitude, longitude, display_order){ // display_order >= 0 // query con trabajo en clase
-        try{
-            var query = 'INSERT INTO provinces(name, full_name, latitude, longitude, display_order) VALUES $1, $2, $3, $4, $5'; //cada $ equivale a un valor, de izquierda a derecha
-            const values = [name, full_name, latitude, longitude, display_order]
-            const result = await client.query(sql, values)
-            if (result.rows.length > 0) {
-                returnEntity = result.rows[0];
-            }
+        const query = 
+        {
+            text: `INSERT INTO provinces(name, full_name, latitude, longitude, display_order) VALUES ($1, $2, $3, $4, $5)`, //cada $ equivale a un valor, de izquierda a derecha
+            values: [name, full_name, latitude, longitude, display_order]
         }
-        catch{
-            console.error('Error in CrearProvincia');
-        }
-        return {}
+        console.log(query.values)
+        const result = await client.query(query)
+        return result
     }
     async BorrarProvincia(id){
         var query = `DELETE FROM provinces WHERE id = ${id}`;
