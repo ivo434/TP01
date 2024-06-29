@@ -36,8 +36,8 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const {name, full_name, latitude, longitude, display_order} = req.body;
   try {
-    if(display_order >= 0){
-      const provincia = await provinceService.CrearProvincia(name,full_name, latitude, longitude, display_order);
+    if(display_order === undefined || display_order >= 0){
+      const provincia = await provinceService.CrearProvincia(name, full_name, latitude, longitude, display_order);
       res.status(201).json(provincia);
     } else {
       res.status(401).json({mensaje: "display_order tiene que ser mayor o igual a 0"})
@@ -57,11 +57,15 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const {id, name, full_name, latitude, longitude} = req.body
-  console.log(id, name, full_name, latitude, longitude);
+  const {name, full_name, latitude, longitude, display_order} = req.body
+  console.log(req.params.id, name, full_name, latitude, longitude, display_order);
   try {
-    const provincia = await provinceService.EditarProvincia(id, name, full_name, latitude, longitude);
-    res.status(200).json(provincia);
+    if(display_order >= 0){
+      const provincia = await provinceService.EditarProvincia(req.params.id, name, full_name, latitude, longitude, display_order);
+      res.status(200).json(provincia);
+    } else {
+      res.status(401).json({mensaje: "display_order tiene que ser mayor o igual a 0"})
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

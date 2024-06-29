@@ -21,6 +21,7 @@ export default class ProvinceRepository {
         return await client.query(query);
     }
     async EditarProvincia(id, name, full_name, latitude, longitude, display_order){
+        // Para arreglar: como hacer para que no comitee si select where id = @id es nulo
         var query = 'UPDATE provinces SET'
         if (name != null) {
             query += ` name = '${name}', `
@@ -38,10 +39,12 @@ export default class ProvinceRepository {
             query += ` display_order = ${display_order}, `
         }
         if (query.endsWith(', ')){
-            query.substring(0,-1)
+            query = query.slice(0,-2)
         }
-        query += `WHERE id = ${id}`
-        return await client.query(query);
+        query += ` WHERE id = ${id}`
+        console.log(query)
+        const {rows} =  await client.query(query);
+        return rows
     }
     async GetAllProvincias(limit, offset){
         var query = `SELECT * From provinces limit ${limit} offset ${offset}`
