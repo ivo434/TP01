@@ -1,12 +1,9 @@
 import express from 'express';
 import UserService from "../services/user-services.js"
 import pkg from "jsonwebtoken";
+import { createToken } from '../utils/token.js';
 const router = express.Router();
 const userService = new UserService();
-const options = {
-    expiresIn : '1h',
-    issuer : 'organizacion'
-}
 
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
@@ -48,11 +45,11 @@ router.post("/register", async (req, res) => {
     const checkIn = verificadorDeRegistro(first_name, last_name, username, password);
     if(checkIn){
         const id = await userService.crearUsuario(first_name, last_name, username, password)
-        const payload = {
+        const user = [{
             id: id,
-            username: username,
-        }
-        const token = pkg.sign(payload, process.env.TOKEN_PASSWORD, options)
+            username: username
+        }];
+        const token = createToken(user)
         return res.status(201).send({
             id: id,
             first_name: first_name,

@@ -2,6 +2,7 @@ import pkg from "jsonwebtoken";
 import "dotenv/config"
 
 export const createToken = (user) => {
+    console.log(user)
     const payload = {
         id: user[0].id,
         username: user[0].username

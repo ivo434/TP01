@@ -73,7 +73,7 @@ export default class EventRepository{
         const {rows} = await client.query(query);
         return rows;
     }
-    async getEvento(id, limit, offset) {
+    async getEvento(id) {
         var query = `SELECT 
         events.id,
         events.name,
