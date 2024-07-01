@@ -53,6 +53,15 @@ class ProvinceService {
             throw error;
         }
     }
+    async GetEventLocationByProvinceId(id) {
+        try {
+            const province = await provinceRepository.GetEventLocationByProvinceId(id);
+            return province;
+        } catch (error) {
+            console.error('Error in GetEventLocationByProvinceId:', error);
+            throw error;
+        }
+    }
 }
 
 export default ProvinceService;

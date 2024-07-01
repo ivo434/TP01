@@ -15,7 +15,15 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
+router.get('/:id/locations', async (req, res) => {
+  try {
+    console.log(req.params.id)
+    const localizaciones = await provinceService.GetEventLocationByProvinceId(req.params.id);
+    res.status(200).json(localizaciones);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 // Obtener todas las provincias con paginación
 router.get('/', async (req, res) => {
   let { limit, offset } = req.query;

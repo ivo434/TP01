@@ -18,7 +18,8 @@ export default class ProvinceRepository {
     }
     async BorrarProvincia(id){
         var query = `DELETE FROM provinces WHERE id = ${id}`;
-        return await client.query(query);
+        const {rows} =  await client.query(query);
+        return rows
     }
     async EditarProvincia(id, name, full_name, latitude, longitude, display_order){
         // Para arreglar: como hacer para que no comitee si select where id = @id es nulo
@@ -56,8 +57,8 @@ export default class ProvinceRepository {
         const {rows} =  await client.query(query);
         return rows
     }
-    async GetEventLocationByProvinceId(id_province, limit, offset){
-        var query = `SELECT id, id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user FROM event_locations WHERE locations.id_province = ${id_province} INNER JOIN locations ON event_locations.id_location = locations.id limit ${limit} offset ${offset}`;
+    async GetEventLocationByProvinceId(id_province){
+        var query = `SELECT l.* FROM locations l JOIN provinces p ON l.id_province = p.id WHERE p.id = ${id_province}`;
         const {rows} =  await client.query(query);
         return rows
     }
