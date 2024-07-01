@@ -1,9 +1,10 @@
 import EventRepository from "../repositories/event-repository.js";
+import CrudRepository from "../repositories/CRUD.js";
 const eventRepository = new EventRepository();
+const crudRepository = new CrudRepository();
 class EventService {
 
     async getListadoEventos(limit, offset) {
-    const basePath = "api/event"
         try {
             return await eventRepository.getListadoEventos(limit, offset)
         } catch (error) {
@@ -45,9 +46,26 @@ class EventService {
             throw error;
         }
     }
-    async CrearEvento(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) {
+    async CrearEvento(evento) {
         try {
-            return await eventRepository.CrearEvento(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user);
+            const values = [
+                evento.id_event_location
+            ];
+            console.log(values)
+            const max_capacity = await crudRepository.Get("SELECT max_capacity FROM event_locations WHERE id = $1", values);
+            console.log(max_capacity)
+            if (evento.name < 3 || evento.description < 3) {
+                return "Nombre menor a 3"
+            }
+            else if (evento.max_assistance > max_capacity){
+                return "Asistencia maxima mayor a capacidad maxima"
+            }
+            else if (evento.price < 0 || evento.duration_in_minutes < 0){
+                return "Precio y duracion menores a 0"
+            }
+            else {
+                return await eventRepository.CrearEvento(evento)
+            }
         } catch (error) {
             console.error('Error in CrearEvento:', error);
             throw error;
@@ -56,12 +74,11 @@ class EventService {
     async BorrarEvento(id, id_creator_user) {
         try {
             const result = await eventRepository.BorrarEvento(id, id_creator_user);
-            filas = result.rowCount;
+            return result;
         } catch (error) {
             console.error('Error in BorrarEvento:', error);
             throw error;
         }
-        return filas;
     }
     async EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) {
         try {

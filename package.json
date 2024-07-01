@@ -6,9 +6,9 @@
   "module": "main",
   "type": "module",
   "scripts": {
-    "start": "node src/script.js",
+    "start": "nodemon src/script.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon script.js"
+    "server": "node script.js"
   },
   "author": "Uriel Cwirenbaum e Iván Latascheff",
   "license": "ISC",

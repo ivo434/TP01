@@ -1,6 +1,10 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
+import Event from "../entities/event.js";
+import CrudRepository from "./CRUD.js";
 
+
+const crudRepository = new CrudRepository()
 const client = new pg.Client(BDConfig);
 client.connect();
 
@@ -275,55 +279,57 @@ export default class EventRepository{
         var query = `INSERT INTO events (name, description, id_event_category, id_event_location, 
             start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
-        const values = [
-            evento.name,
-            evento.description,
-            evento.id_event_category,
-            evento.id_event_location,
-            evento.start_date
-        ]
-            const {rows} = await client.query(query);
+            const valuesArray = Object.values(evento);
+            valuesArray.shift()
+            const {rows} = await client.query(query, valuesArray);
             return rows;
     }
     async BorrarEvento(id, id_creator_user){
-        var query = `DELETE FROM events WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
-        const values = await client.query(query);
-        return values;
+        if (this.getEvento(id) === null || this.getEvento(id).events.id_creator_user !== id_creator_user) {
+            return "404"
+        } else if(crudRepository.Get('select * from event_enrollments where id_event = $1', [id]) === null){
+            return "400"
+        }
+        else{
+            var query = `DELETE FROM events WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
+            const values = await client.query(query);
+            return values;
+        }
     }
-    async EditarEvento(id, name, description, id_event_category, id_event_location, start_date, 
-        duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
-        var query = 'UPDATE events SET'
-        if (name != null) {
-            query += `name = '${name}', `;
+    async EditarEvento(id, evento){
+        var query = 'UPDATE events SET '
+        if (evento.name != null) {
+            query += `name = '${evento.name}', `;
         }
-        if (description != null) {
-            query += `description = '${description}', `;
+        if (evento.description != null) {
+            query += `description = '${evento.description}', `;
         }
-        if (id_event_category != null) {
-            query += `id_event_category = '${id_event_category}', `;
+        if (evento.id_event_category != null) {
+            query += `id_event_category = '${evento.id_event_category}', `;
         }
-        if (id_event_location != null) {
-            query += `id_event_location = '${id_event_location}', `;
+        if (evento.id_event_location != null) {
+            query += `id_event_location = '${evento.id_event_location}', `;
         }
-        if (start_date != null) {
-            query += `start_date = '${start_date}', `;
+        if (evento.start_date != null) {
+            query += `start_date = '${evento.start_date}', `;
         }
-        if (duration_in_minutes != null) {
-            query += `duration_in_minutes = '${duration_in_minutes}', `;
+        if (evento.duration_in_minutes != null) {
+            query += `duration_in_minutes = '${evento.duration_in_minutes}', `;
         }
-        if (price != null) {
-            query += `price = '${price}', `;
+        if (evento.price != null) {
+            query += `price = '${evento.price}', `;
         }
-        if (enabled_for_enrollment != null) {
-            query += `enabled_for_enrollment = ${enabled_for_enrollment}, `;
+        if (evento.enabled_for_enrollment != null) {
+            query += `enabled_for_enrollment = ${evento.enabled_for_enrollment}, `;
         }
-        if (max_assistance != null) {
-            query += `max_assistance = '${max_assistance}', `;
+        if (evento.max_assistance != null) {
+            query += `max_assistance = '${evento.max_assistance}', `;
         }
         if (query.endsWith(', ')){
-            query.substring(0,-1)
+            query = query.slice(0,-2)
         }
-        query += updates.join(', ') + ` WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
+        query += ` WHERE id = ${id} AND id_creator_user = ${evento.id_creator_user}`;
+        console.log(query)
         try {
             await client.query(query);
             console.log('Evento actualizado');

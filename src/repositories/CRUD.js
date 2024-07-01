@@ -8,39 +8,39 @@ client.connect();
 
 export default class CrudRepository {
     async Create(query, values){ // display_order >= 0 // query con trabajo en clase
-        const query = 
+        const command = 
         {
             text: query, //cada $ equivale a un valor, de izquierda a derecha
             values: values
         }
-        const result = await client.query(query)
+        const result = await client.query(command)
         return result
     }
     async Delete(query, values){
-        const query = 
+        const command = 
         {
             text: query, //cada $ equivale a un valor, de izquierda a derecha
             values: values
         }
-        const {rows} =  await client.query(query);
+        const {rows} =  await client.query(command);
         return rows
     }
     async Update(query, values){
-        const query = 
+        const command = 
         {
             text: query, //cada $ equivale a un valor, de izquierda a derecha
             values: values
         }
-        const {rows} =  await client.query(query);
+        const {rows} =  await client.query(command);
         return rows
     }
     async Get(query,values){
-        const query = 
+        const command = 
         {
             text: query, //cada $ equivale a un valor, de izquierda a derecha
             values: values
         }
-        const {rows} =  await client.query(query);
+        const {rows} =  await client.query(command);
         return rows
     }
 }

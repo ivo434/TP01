@@ -1,6 +1,7 @@
 import express from 'express';
 import EventService from '../services/event-services.js';
-import {AuthMiddleware, decryptToken} from '../utils/token.js';
+import Event from '../entities/event.js';
+import {AuthMiddleware} from '../utils/token.js';
 import EventEnrollment from '../entities/event-enrollments.js';
 import { Pagination } from "../utils/paginacion.js";
 
@@ -74,31 +75,32 @@ router.get('/:id/enrollment', async (req, res) => {
 
 router.post('/', AuthMiddleware, async (req, res) => {
     const {name, description, id_event_category, id_event_location, start_date, 
-        duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user} = req.body;
-    const evento = new Event(name, description, id_event_category, id_event_location, start_date, 
+        duration_in_minutes, price, enabled_for_enrollment, max_assistance} = req.body;
+    const id_creator_user = req.user.id;
+    const evento = new Event(null, name, description, id_event_category, id_event_location, start_date, 
         duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user)
     try {
         const newEvent = await eventService.CrearEvento(evento);
-        if (newEvent > 0){
-            return res.status(201).json({'mensaje':'Se elimino el evento'});
-        }else{
-            return res.status(404).json({'mensaje':'no se elimino'});
+        if (newEvent === "Nombre menor a 3" || newEvent === "Asistencia maxima mayor a capacidad maxima" || newEvent === "Precio y duracion menores a 0") {
+            return res.status(400).json(newEvent)
         }
+        return res.status(201).json({'mensaje':'Se creo el evento'});
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 
-router.delete('/:id', async (req, res) => {
-    const token = req.headers.authorization;
-    const payload = decryptToken(token);
+router.delete('/:id', AuthMiddleware, async (req, res) => {
     try {
-        const filas = await eventService.BorrarEvento(req.params.id, payload.id);
-        if (filas > 0){
-            return res.status(200).json({mensaje:'Se elimino el evento'});
-        }else{
-            return res.status(404).json({mensaje:'No se elimino'});
+        const filas = await eventService.BorrarEvento(req.params.id, req.user.id);
+        if (filas === "404") {
+            return res.status(404).json("Id invalido o no perteneciente al usuario")
+        } else if(filas === "400"){
+            return res.status(400).json("Usuarios registrados en el evento")
+        }
+        else{
+            return res.status(200).json({mensaje:'Se elimino el evento', filas});
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -106,28 +108,32 @@ router.delete('/:id', async (req, res) => {
 });
 
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', AuthMiddleware, async (req, res) => {
     const eventData = req.body;
-    const token = req.headers.authorization;
-    const payload = decryptToken(token);
+    const {name, description, id_event_category, id_event_location, start_date, 
+        duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user} = req.query;
+    const idPayload = req.user.id;
+    const evento = new Event(null, name, description, id_event_category, id_event_location, start_date, 
+        duration_in_minutes, price, enabled_for_enrollment, max_assistance, idPayload)
     try {
-        await eventService.EditarEvento(req.params.id, ...Object.values(eventData));
-        res.status(200).json({ message: 'Evento actualizado correctamente' });
+        if (req.params.id === null || idPayload !== id_creator_user) {
+            res.status(404).json("Id invalido o no perteneciente al usuario")
+        } else{
+            await eventService.EditarEvento(req.params.id, evento);
+            res.status(200).json({ message: 'Evento actualizado correctamente' });
+        }
     } catch (error) {
-        res.status(404).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-router.post('/:id/enrollment/', (req, res) => {
+router.post('/:id/enrollment/', AuthMiddleware, (req, res) => {
     const fecha = new Date();
     const { attended, observations, rating } = req.body
-    const token = req.headers.authorization;
-    const payload = decryptToken(token);
-    const userId = payload.id
     const event = eventService.getEvento(req.params.id)
     const newEventEnrollment = new EventEnrollment(
         req.params.id,
-        userId,
+        user.id,
         event.description,
         fecha,
         attended,
@@ -136,12 +142,9 @@ router.post('/:id/enrollment/', (req, res) => {
     )
     try {
         const event = eventService.enrollUserToEvent(newEventEnrollment);
-        if (!event) {
-            return res.status(404).json({ error: 'Evento no encontrado' });
-        }
         res.status(201).json({ message: 'Usuario registrado exitosamente en el evento' });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
