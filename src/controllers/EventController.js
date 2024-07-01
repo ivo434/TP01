@@ -1,6 +1,6 @@
 import express from 'express';
 import EventService from '../services/event-services.js';
-import {decryptToken} from '../utils/token.js';
+import {AuthMiddleware, decryptToken} from '../utils/token.js';
 import EventEnrollment from '../entities/event-enrollments.js';
 import { Pagination } from "../utils/paginacion.js";
 
@@ -72,12 +72,13 @@ router.get('/:id/enrollment', async (req, res) => {
 });
 
 
-router.post('/', async (req, res) => {
-    const eventData = req.body;
-    const token = req.headers.authorization;
-    const payload = decryptToken(token);
+router.post('/', AuthMiddleware, async (req, res) => {
+    const {name, description, id_event_category, id_event_location, start_date, 
+        duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user} = req.body;
+    const evento = new Event(name, description, id_event_category, id_event_location, start_date, 
+        duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user)
     try {
-        const newEvent = await eventService.CrearEvento(...Object.values(eventData));
+        const newEvent = await eventService.CrearEvento(evento);
         if (newEvent > 0){
             return res.status(201).json({'mensaje':'Se elimino el evento'});
         }else{

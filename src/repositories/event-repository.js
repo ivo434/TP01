@@ -271,15 +271,19 @@ export default class EventRepository{
             const {rows} = await client.query(query);
             return rows;
     }
-    async CrearEvento(name, description, id_event_category, id_event_location, start_date, 
-        duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){ // display_order >= 0
+    async CrearEvento(evento){ // display_order >= 0
         var query = `INSERT INTO events (name, description, id_event_category, id_event_location, 
             start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) 
-            VALUES ('${name}', '${description}', ${id_event_category}, ${id_event_location}, '${start_date}', 
-            ${duration_in_minutes}, ${price}, ${enabled_for_enrollment}, ${max_assistance}, ${id_creator_user})`;
-        const listQueryDB = query.execute(query);
-        const values = await client.query(query);
-        return values;
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+        const values = [
+            evento.name,
+            evento.description,
+            evento.id_event_category,
+            evento.id_event_location,
+            evento.start_date
+        ]
+            const {rows} = await client.query(query);
+            return rows;
     }
     async BorrarEvento(id, id_creator_user){
         var query = `DELETE FROM events WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
