@@ -1,6 +1,5 @@
 import express from 'express';
 import UserService from "../services/user-services.js"
-import pkg from "jsonwebtoken";
 import { createToken } from '../utils/token.js';
 const router = express.Router();
 const userService = new UserService();
