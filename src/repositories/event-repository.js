@@ -374,4 +374,22 @@ export default class EventRepository{
             throw error;
         }
     }
+    async patchEnrollment(id_user, id_event, rating, observations){
+        var query = `
+            UPDATE event_enrollments SET attended = true, rating = $1, observations = $2 WHERE id_user = $3 and id_event = $4
+        `;
+        const values = [
+            rating,
+            observations,
+            id_user,
+            id_event
+        ]
+        try {
+            await client.query(query, values);
+            console.log('Usuario puso su rating exitosamente');
+        } catch (error) {
+            console.error('Error al ponerle rating a un evento', error.stack);
+            throw error;
+        }
+    }
 }

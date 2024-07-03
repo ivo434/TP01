@@ -204,15 +204,37 @@ router.delete('/:id/enrollment/',AuthMiddleware, async (req, res) => {
     }
 });
 
-router.patch("/:id/enrollment", (req, res) => {
-    if(!Number.isInteger(Number(req.body.rating))&& Number.isInteger(Number(req.body.attended))){
+router.patch("/:id/enrollment/:rating", AuthMiddleware, async (req, res) => {
+    const {observations} = req.body
+    if (req.params.id === null) {
+        return res.status(404).json("ID de evento inexistente")
+    }
+    if(!Number.isInteger(Number(req.params.rating))&& Number.isInteger(Number(req.params.rating))){
         return res.status(400).json({ error: 'El formato de attended no es valido' });
     }
-    const {rating, descripcion, attended, observation} = req.body
+    const enrollments = await crudRepository.Get("select * from event_enrollments where id_event = $1", [req.params.id])
+    if(req.params.rating < 1 && req.params.rating > 10){
+        return res.status(400).json({ error: 'El formato de attended no es valido, son numeros del 1 al 10' });
+    }
+    const event = await eventService.getEvento(req.params.id)
+    let verif = true;
+    const fecha = new Date()
+    enrollments.forEach(item => {
+        if (item.id_user === req.user.id) {
+            verif = false;
+        }
+    });
+    if (verif) {
+        return res.status(400).json({ error: 'El usuario no se encuentra registrado en el evento' });
+    }
+    const eventStartDate = new Date(event[0].start_date);
+    console.log(event[0])
+    if (eventStartDate > fecha) {
+        return res.status(400).json({ error: 'No es posible eliminarse de un evento que ya ha sucedido o que se realiza hoy' });
+    }
     try {
-        
-        const enrollment = eventService.patchEnrollment(rating, descripcion, attended, observation);
-        return res.json(enrollment);
+        const enrollment = await eventService.patchEnrollment(req.user.id, req.params.id, req.params.rating, observations);
+        return res.status(200).json("Usuario ha puesto su rating correctamente");
     }
     catch(error){
         console.log("Error al puntuar");

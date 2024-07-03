@@ -119,9 +119,9 @@ class EventService {
             throw error;
         }
       }
-    async postInscripcionEvento(id, id_user){
+    async patchEnrollment(id_user, id_event, rating, observations){
         try {
-            return await eventRepository.postInscripcionEvento(id, id_user); // NO ESTA HECHO
+            return await eventRepository.patchEnrollment(id_user, id_event, rating, observations); // NO ESTA HECHO
         } catch (error) {
             console.error('Error in postInscripcionEvento', error);
             throw error;
