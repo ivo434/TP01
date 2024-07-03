@@ -4,9 +4,11 @@ import Event from '../entities/event.js';
 import {AuthMiddleware} from '../utils/token.js';
 import EventEnrollment from '../entities/event-enrollments.js';
 import { Pagination } from "../utils/paginacion.js";
+import CrudRepository from '../repositories/CRUD.js';
 
 const router = express.Router();
 const eventService = new EventService();
+const crudRepository = new CrudRepository();
 const pagination = new Pagination();
 
 router.get('/', async (req, res) => {
@@ -109,59 +111,98 @@ router.delete('/:id', AuthMiddleware, async (req, res) => {
 
 
 router.put('/:id', AuthMiddleware, async (req, res) => {
-    const eventData = req.body;
     const {name, description, id_event_category, id_event_location, start_date, 
-        duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user} = req.query;
+        duration_in_minutes, price, enabled_for_enrollment, max_assistance} = req.query;
     const idPayload = req.user.id;
+    const oldEvent = await crudRepository.Get("select * from events where id = $1", [req.params.id])
     const evento = new Event(null, name, description, id_event_category, id_event_location, start_date, 
         duration_in_minutes, price, enabled_for_enrollment, max_assistance, idPayload)
     try {
-        if (req.params.id === null || idPayload !== id_creator_user) {
+        if (req.params.id === null || idPayload !== oldEvent[0].id_creator_user) {
             res.status(404).json("Id invalido o no perteneciente al usuario")
-        } else{
-            await eventService.EditarEvento(req.params.id, evento);
-            res.status(200).json({ message: 'Evento actualizado correctamente' });
+        }
+         else{
+            const newEvent = await eventService.EditarEvento(req.params.id, evento);
+            if (newEvent === "Nombre menor a 3" || newEvent === "Asistencia maxima mayor a capacidad maxima" || newEvent === "Precio y duracion menores a 0") {
+                return res.status(400).json(newEvent)
+            } else{
+                res.status(200).json({ message: 'Evento actualizado correctamente' });
+            }
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-router.post('/:id/enrollment/', AuthMiddleware, (req, res) => {
+router.post('/:id/enrollment/', AuthMiddleware, async (req, res) => {
     const fecha = new Date();
-    const { attended, observations, rating } = req.body
-    const event = eventService.getEvento(req.params.id)
+    let verif = true;
+    const enrollments = await crudRepository.Get("select * from event_enrollments where id_event = $1", [req.params.id])
+    const event = await eventService.getEvento(req.params.id)
     const newEventEnrollment = new EventEnrollment(
+        null,
         req.params.id,
-        user.id,
-        event.description,
+        req.user.id,
+        event[0].description,
         fecha,
-        attended,
-        observations,
-        rating
+        false,
+        null,
+        null
     )
+    console.log(newEventEnrollment)
+    if (enrollments.length >= event[0].max_assistance) {
+        return res.status(400).json({ error: 'La capacidad máxima de registrados para el evento ha sido alcanzada' });
+    }
+    const eventStartDate = new Date(event[0].start_date);
+    console.log(event[0])
+    if (eventStartDate <= fecha) {
+        return res.status(400).json({ error: 'No es posible registrarse a un evento que ya ha sucedido o que se realiza hoy' });
+    }
+    
+    if (!event[0].enabled_for_enrollment) {
+        return res.status(400).json({ error: 'El evento no está habilitado para la inscripción' });
+    }
+    enrollments.forEach(item => {
+        if (item.id_user === req.user.id) {
+            verif = false;
+        }
+    });
+    if (!verif) {
+        return res.status(400).json({ error: 'El usuario ya se encuentra registrado en el evento' });
+    }
     try {
-        const event = eventService.enrollUserToEvent(newEventEnrollment);
+        await eventService.enrollUserToEvent(newEventEnrollment);
         res.status(201).json({ message: 'Usuario registrado exitosamente en el evento' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-router.delete('/:id/enrollment/', (req, res) => {
-    const eventId = req.params.id;
-    const token = req.headers.authorization;
-    const payload = decryptToken(token);
-    const userId = payload.id
+router.delete('/:id/enrollment/',AuthMiddleware, async (req, res) => {
+    const enrollments = await crudRepository.Get("select * from event_enrollments where id_event = $1", [req.params.id])
+    const event = await eventService.getEvento(req.params.id)
+    let verif = true;
+    const fecha = new Date()
+    enrollments.forEach(item => {
+        if (item.id_user === req.user.id) {
+            verif = false;
+        }
+    });
+    if (verif) {
+        return res.status(400).json({ error: 'El usuario no se encuentra registrado en el evento' });
+    }
+    const eventStartDate = new Date(event[0].start_date);
+    console.log(event[0])
+    if (eventStartDate <= fecha) {
+        return res.status(400).json({ error: 'No es posible eliminarse de un evento que ya ha sucedido o que se realiza hoy' });
+    }
     try {
-        eventService.removeUserFromEvent(eventId, userId);
+        await eventService.removeUserFromEvent(req.params.id, req.user.id);
         res.status(200).json({ message: 'Usuario removido exitosamente del evento' });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 });
-
-
 
 router.patch("/:id/enrollment", (req, res) => {
     if(!Number.isInteger(Number(req.body.rating))&& Number.isInteger(Number(req.body.attended))){
@@ -178,109 +219,5 @@ router.patch("/:id/enrollment", (req, res) => {
         return res.status(404).json("Un Error");
     }
 });
-
-
-// /**
-//  * POST /api/event/
-//  * Inserta un evento que es enviado en el body de request (necesita autenticación).
-//  */
-// router.post('/event', async (req, res) => {
-//     try {
-//       // Verificar autenticación del usuario (supongamos que ya está implementado)
-//       const authenticatedUserId = req.user.id; // Obtener ID del usuario autenticado desde el token
-  
-//       // Extraer datos del cuerpo de la solicitud
-//       const { name, description, max_assistance, id_event_location, price, duration_in_minutes } = req.body;
-  
-//       // Validar datos
-//       if (!name || !description || name.length < 3 || description.length < 3) {
-//         return res.status(400).json({ error: 'El nombre y la descripción deben tener al menos 3 caracteres' });
-//       }
-  
-//       // Verificar que max_assistance no sea mayor que max_capacity de la ubicación
-//       const location = await db.query('SELECT max_capacity FROM ubicaciones WHERE id = ?', [id_event_location]);
-//       if (!location || max_assistance > location[0].max_capacity) {
-//         return res.status(400).json({ error: 'El número máximo de asistentes supera la capacidad máxima de la ubicación' });
-//       }
-  
-//       if (price < 0 || duration_in_minutes < 0) {
-//         return res.status(400).json({ error: 'El precio y la duración deben ser mayores o iguales a cero' });
-//       }
-  
-//       // Insertar evento en la base de datos
-//       const result = await db.query('INSERT INTO eventos (name, description, max_assistance, id_event_location, price, duration_in_minutes, id_creator) VALUES (?, ?, ?, ?, ?, ?, ?)',
-//         [name, description, max_assistance, id_event_location, price, duration_in_minutes, authenticatedUserId]);
-  
-//       res.status(201).json({ message: 'Evento creado exitosamente' });
-//     } catch (error) {
-//       console.error('Error al crear evento:', error);
-//       res.status(500).json({ error: 'Error al crear evento' });
-//     }
-//   });
-  
-//   /**
-//    * PUT /api/event/
-//    * Actualiza un evento que es enviado en el body y retorna un status code 200 (ok).
-//    */
-//   router.put('/event', async (req, res) => {
-//     try {
-//       // Verificar autenticación del usuario (supongamos que ya está implementado)
-//       const authenticatedUserId = req.user.id; // Obtener ID del usuario autenticado desde el token
-  
-//       // Extraer datos del cuerpo de la solicitud
-//       const { id, name, description, max_assistance, id_event_location, price, duration_in_minutes } = req.body;
-  
-//       // Validar que el evento existe y pertenece al usuario autenticado
-//       const existingEvent = await db.query('SELECT id_creator FROM eventos WHERE id = ?', [id]);
-//       if (!existingEvent || existingEvent[0].id_creator !== authenticatedUserId) {
-//         return res.status(404).json({ error: 'El evento no existe o no pertenece al usuario autenticado' });
-//       }
-  
-//       // Validar datos (mismo proceso de validación que en POST)
-  
-//       // Actualizar evento en la base de datos
-//       await db.query('UPDATE eventos SET name = ?, description = ?, max_assistance = ?, id_event_location = ?, price = ?, duration_in_minutes = ? WHERE id = ?',
-//         [name, description, max_assistance, id_event_location, price, duration_in_minutes, id]);
-  
-//       res.status(200).json({ message: 'Evento actualizado exitosamente' });
-//     } catch (error) {
-//       console.error('Error al actualizar evento:', error);
-//       res.status(500).json({ error: 'Error al actualizar evento' });
-//     }
-//   });
-  
-//   /**
-//    * DELETE /api/event/{id}
-//    * Elimina un evento cuyo id es enviado por parámetro.
-//    */
-//   router.delete('/event/:id', async (req, res) => {
-//     try {
-//       // Verificar autenticación del usuario (supongamos que ya está implementado)
-//       const authenticatedUserId = req.user.id; // Obtener ID del usuario autenticado desde el token
-//       const eventId = req.params.id;
-  
-//       // Verificar que el evento existe y pertenece al usuario autenticado
-//       const existingEvent = await db.query('SELECT id_creator FROM eventos WHERE id = ?', [eventId]);
-//       if (!existingEvent || existingEvent[0].id_creator !== authenticatedUserId) {
-//         return res.status(404).json({ error: 'El evento no existe o no pertenece al usuario autenticado' });
-//       }
-  
-//       // Verificar si hay usuarios registrados al evento (supongamos que existe una tabla de registros de usuarios a eventos)
-//       const registeredUsers = await db.query('SELECT COUNT(*) AS count FROM registros_eventos WHERE id_evento = ?', [eventId]);
-//       if (registeredUsers[0].count > 0) {
-//         return res.status(400).json({ error: 'No se puede eliminar el evento porque hay usuarios registrados a él' });
-//       }
-  
-//       // Eliminar evento de la base de datos
-//       await db.query('DELETE FROM eventos WHERE id = ?', [eventId]);
-  
-//       res.status(200).json({ message: 'Evento eliminado exitosamente' });
-//     } catch (error) {
-//       console.error('Error al eliminar evento:', error);
-//       res.status(500).json({ error: 'Error al eliminar evento' });
-//     }
-//   });
-  
-  
 
 export default router;

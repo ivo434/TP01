@@ -80,9 +80,24 @@ class EventService {
             throw error;
         }
     }
-    async EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) {
+    async EditarEvento(id, evento) {
         try {
-            return await eventRepository.EditarEvento(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user);
+            const values = [
+                evento.id_event_location
+            ];
+            const max_capacity = await crudRepository.Get("SELECT max_capacity FROM event_locations WHERE id = $1", values);
+            if (evento.name != null && evento.description != null && evento.name < 3 || evento.description < 3) {
+                return "Nombre menor a 3"
+            }
+            else if (evento.max_assistance != null && evento.max_assistance > max_capacity){
+                return "Asistencia maxima mayor a capacidad maxima"
+            }
+            else if (evento.price != null && evento.duration_in_minutes != null && evento.price < 0 || evento.duration_in_minutes < 0){
+                return "Precio y duracion menores a 0"
+            }
+            else {
+                return await eventRepository.EditarEvento(id, evento)
+            }
         } catch (error) {
             console.error('Error in EditarEvento:', error);
             throw error;

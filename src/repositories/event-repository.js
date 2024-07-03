@@ -340,7 +340,7 @@ export default class EventRepository{
     }
     async enrollUserToEvent(eventEnrollment) {
         const query = `
-            INSERT INTO event_enrollment (id_event, id_user, description, registration_date_time, attended, observations, rating)
+            INSERT INTO event_enrollments (id_event, id_user, description, registration_date_time, attended, observations, rating)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
         `;
         const values = [
@@ -362,8 +362,8 @@ export default class EventRepository{
     } 
     async removeUserFromEvent(eventEnrollmentId, userId) {
         const query = `
-            DELETE FROM event_enrollment
-            WHERE id = $1 && id_user = $2
+            DELETE FROM event_enrollments
+            WHERE id_event = $1 AND id_user = $2
         `;
         const values = [eventEnrollmentId, userId];
         try {
