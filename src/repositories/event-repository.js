@@ -279,19 +279,17 @@ export default class EventRepository{
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
             const valuesArray = Object.values(evento);
             valuesArray.shift()
-            const {rows} = await client.query(query, valuesArray);
-            return rows;
+            const res = await client.query(query, values);
+            return res.rowCount;
     }
     async BorrarEvento(id, id_creator_user){
-        if (this.getEvento(id) === null || this.getEvento(id).events.id_creator_user !== id_creator_user) {
-            return "404"
-        } else if(crudRepository.Get('select * from event_enrollments where id_event = $1', [id]) === null){
+        if(crudRepository.Get('select * from event_enrollments where id_event = $1', [id]) === null){
             return "400"
         }
         else{
             var query = `DELETE FROM events WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
-            const values = await client.query(query);
-            return values;
+            const res = await client.query(query, values);
+            return res.rowCount;
         }
     }
     async EditarEvento(id, evento){
@@ -329,8 +327,8 @@ export default class EventRepository{
         query += ` WHERE id = ${id} AND id_creator_user = ${evento.id_creator_user}`;
         console.log(query)
         try {
-            await client.query(query);
-            console.log('Evento actualizado');
+            const res = await client.query(query, values);
+            return res.rowCount;
         } catch (error) {
             console.error('Error al actualizar el evento', error.stack);
             throw error;

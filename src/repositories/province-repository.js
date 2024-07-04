@@ -13,13 +13,13 @@ export default class ProvinceRepository {
             values: [name, full_name, latitude, longitude, display_order]
         }
         console.log(query.values)
-        const result = await client.query(query)
-        return result
+        const res = await client.query(query, values);
+        return res.rowCount;
     }
     async BorrarProvincia(id){
         var query = `DELETE FROM provinces WHERE id = ${id}`;
-        const {rows} =  await client.query(query);
-        return rows
+        const res = await client.query(query, values);
+        return res.rowCount;
     }
     async EditarProvincia(id, name, full_name, latitude, longitude, display_order){
         // Para arreglar: como hacer para que no comitee si select where id = @id es nulo
@@ -44,8 +44,8 @@ export default class ProvinceRepository {
         }
         query += ` WHERE id = ${id}`
         console.log(query)
-        const {rows} =  await client.query(query);
-        return rows
+        const res = await client.query(query, values);
+        return res.rowCount;
     }
     async GetAllProvincias(limit, offset){
         var query = `SELECT * From provinces limit ${limit} offset ${offset}`
@@ -54,12 +54,22 @@ export default class ProvinceRepository {
     }
     async GetProvinciaById(id){
         var query = `SELECT * From provinces WHERE id = ${id}`
-        const {rows} =  await client.query(query);
-        return rows
+        const values =  await client.query(query);
+        if (values.rowsCount >= 1) {
+            return values.rows
+        }
+        else{
+            return values.rowCount
+        }
     }
     async GetEventLocationByProvinceId(id_province){
         var query = `SELECT l.* FROM locations l JOIN provinces p ON l.id_province = p.id WHERE p.id = ${id_province}`;
-        const {rows} =  await client.query(query);
-        return rows
+        const values =  await client.query(query);
+        if (values.rowsCount >= 1) {
+            return values.rows
+        }
+        else{
+            return values.rowCount
+        }
     }
 }

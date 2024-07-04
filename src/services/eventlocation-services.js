@@ -1,44 +1,44 @@
 import EventLocationRepository from "../repositories/eventlocation-repository.js";
 const eventLocationRepository = new EventLocationRepository();
 export default class EventLocationService {
-    async GetEventLocations(limit, offset){
+    async getEventLocations(id_user, limit, offset){
         try {
-            return await eventLocationRepository.GetEventLocations(limit, offset);
+            return await eventLocationRepository.getEventLocations(id_user, limit, offset);
         } catch (error) {
             console.error('Error in GetEventLocations:', error);
             throw error;
         }
     }
-    async getEventLocationById(id) {
+    async getEventLocationById(id, user_id) {
         try {
-            const eventLocation = await eventLocationRepository.getEventLocationById(id);
+            const eventLocation = await eventLocationRepository.getEventLocationById(id, user_id);
             return eventLocation;
         } catch (error) {
             console.error('Error in getEventLocationById:', error);
             throw error;
         }
     }
-    async CrearEventLocation(eventLocation){
+    async crearEventLocation(eventLocation){
         try {
-            const res = await eventLocationRepository.CrearEventLocation(eventLocation);
+            const res = await eventLocationRepository.crearEventLocation(eventLocation);
             return res;
         } catch (error){
             console.error('Error in CrearEventLocation:', error);
             throw error;
         }
     }
-    async UpdateEventLocation(eventLocation){
+    async updateEventLocation(eventLocation){
         try {
-            const res = await eventLocationRepository.UpdateEventLocation(eventLocation);
+            const res = await eventLocationRepository.updateEventLocation(eventLocation);
             return res;
         } catch (error){
             console.error('Error in UpdateEventLocation:', error);
             throw error;
         }
     }
-    async DeleteEventLocation(id, id_creator_user){
+    async deleteEventLocation(id, id_creator_user){
         try {
-            const res = await eventLocationRepository.DeleteEventLocation(eventLocation);
+            const res = await eventLocationRepository.deleteEventLocation(id, id_creator_user);
             return res;
         } catch (error){
             console.error('Error in DeleteEventLocation:', error);

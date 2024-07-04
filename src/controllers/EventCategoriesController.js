@@ -1,16 +1,20 @@
 import express from 'express';
-import EventCategoryService from "../services/EventCategory-services.js";
+import EventCategoryService from "../services/eventcategory-services.js";
 import EventCategory from "../entities/event-categories.js";
 
 const router = express.Router();
 const eventCategoryService = new EventCategoryService();
 
 router.get('/', async (req, res) => {
+  let { limit, offset } = req.query;
+  limit = pagination.parseLimit(limit)
+  offset = pagination.parseOffset(offset)
   try {
-    const limit = req.query.limit || 10;
-    const offset = req.query.offset || 0;
-    const categories = await eventCategoryService.GetEventCategories(limit, offset);
-    res.json(categories);
+    const collection = await eventCategoryService.getEventCategories(limit, offset);
+    const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
+    res.status(200).json({
+      paginacion: paginatedResponse
+    });
   } catch (error) {
     console.error('Error al obtener todas las categorías:', error);
     res.status(500).json({ error: 'Error al obtener todas las categorías.' });
@@ -18,58 +22,88 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
   try {
-    const category = await eventCategoryService.getEventCategoryById(id);
+    const category = await eventCategoryService.getEventCategoryById(req.params.id);
     if (!category) {
-      res.status(404).json({ error: 'Categoría de evento no encontrada.' });
-    } else {
-      res.json(category);
-    }
+      return res.status(404).json({ error: 'el id sea inexistente' });
+  }
+    res.status(200).json(category)
   } catch (error) {
     console.error('Error al obtener la categoría por ID:', error);
     res.status(500).json({ error: 'Error al obtener la categoría por ID.' });
   }
 });
 
-router.put('/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  const { name, display_order } = req.body;
-  try {
-    const updatedCategory = new EventCategory(id, name, display_order);
-    await eventCategoryService.UpdateEventCategory(updatedCategory);
-    res.sendStatus(200);
-  } catch (error) {
-    if (error.message === 'El nombre debe tener al menos tres letras.') {
-      res.status(400).json({ error: error.message });
-    } else {
-      console.error('Error al actualizar la categoría:', error);
-      res.status(500).json({ error: 'Error al actualizar la categoría.' });
-    }
-  }
-});
-
 router.post('/', async (req, res) => {
   const { name, display_order } = req.body;
   const newCategory = new EventCategory(null, name, display_order);
+  const verif = verificarPost(name);
   try {
-    await eventCategoryService.CrearEventCategory(newCategory);
-    res.sendStatus(200);
+    if (verif === true) {
+      await eventCategoryService.crearEventCategory(newCategory);
+      res.status(200).json("Categoria creada");
+    }
+    else {
+      res.status(400).json(verif)
+    }
   } catch (error) {
     console.error('Error al insertar la categoría:', error);
     res.status(500).json({ error: 'Error al insertar la categoría.' });
   }
 });
 
-router.delete('/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
+router.put('/:id', async (req, res) => {
+  const { name, display_order } = req.body;
+  const updatedCategory = new EventCategory(req.params.id, name, display_order);
+  const verif = verificarPut(name);
   try {
-    await eventCategoryService.DeleteEventCategory(id);
-    res.sendStatus(200);
+    if (verif === true) {
+      const category = await eventCategoryService.updateEventCategory(updatedCategory);
+      if (!category) {
+        res.status(404).json({ error: 'el id sea inexistente' });
+      }
+      res.status(200).json("Categoria actualizada");
+    }
+    else {
+      res.status(400).json(verif)
+    }
+  } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const category = await eventCategoryService.deleteEventCategory(req.params.id);
+    if (category === "404") {
+      res.status(404).json("ID Invalido")
+    }
+    res.status(200).json("Categoria borrada");
   } catch (error) {
     console.error('Error al borrar la categoría:', error);
     res.status(500).json({ error: 'Error al borrar la categoría.' });
   }
 });
+
+function verificarPost(name){
+  if (name === undefined) {
+    return "Valores indefinidos"
+  }
+  else if (name.length < 3) {
+    return "Nombre menor a 3 o igual a 0"
+  }
+  else {
+    return true
+  }
+}
+
+function verificarPut(name){
+  if (name.length < 3) {
+    return "Nombre menor a 3 o igual a 0"
+  }
+  else {
+    return true
+  }
+}
 
 export default router;

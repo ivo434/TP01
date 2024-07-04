@@ -1,9 +1,11 @@
-import EventCategoryRepository from "../repositories/event-categories.js";
+import EventCategoryRepository from "../repositories/eventcategory-repository.js";
+
 const eventCategoryRepository = new EventCategoryRepository();
+
 export default class EventCategoryService{
-    async GetEventCategories(limit, offset){
+    async getEventCategories(limit, offset){
         try {
-            return await eventCategoryRepository.GetAllCategories(limit, offset);
+            return await eventCategoryRepository.getAllCategories(limit, offset);
         } catch (error) {
             console.error('Error in GetEventCategories:', error);
             throw error;
@@ -11,35 +13,44 @@ export default class EventCategoryService{
     }
     async getEventCategoryById(id) {
         try {
-            const eventCategory = await eventCategoryRepository.GetCategoriesById(id);
-            return eventCategory;
+            const eventCategory = await eventCategoryRepository.getCategoriesById(id);
+            return checkId(id, eventCategory)
         } catch (error) {
             console.error('Error in GetEventCategoryById:', error);
             throw error;
         }
     }
-    async CrearEventCategory(eventCategory){
+    async crearEventCategory(eventCategory){
         try {
-            await eventCategoryRepository.InsertCategory(eventCategory)
+            await eventCategoryRepository.insertCategory(eventCategory)
         } catch (error){
             console.error('Error in CrearEventCategory:', error);
             throw error;
         }
     }
-    async UpdateEventCategory(eventCategory){
+    async updateEventCategory(eventCategory){
         try {
-            await eventCategoryRepository.UpdateCategory(eventCategory)
+            await eventCategoryRepository.updateCategory(eventCategory)
         } catch (error){
             console.error('Error in UpdateEventCategory:', error);
             throw error;
         }
     }
-    async DeleteEventCategory(id){
+    async deleteEventCategory(id){
         try {
-            await eventCategoryRepository.DeleteCategory(id)
+            await eventCategoryRepository.deleteCategory(id)
+            return checkId(id, {})
         } catch (error){
             console.error('Error in DeleteEventCategory:', error);
             throw error;
         }
+    }
+}
+function checkId(id, object){
+    if (id === null) {
+        return "404"
+    }
+    else{
+        return object;
     }
 }

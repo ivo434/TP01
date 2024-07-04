@@ -1,26 +1,22 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
-import EventLocation from "../entities/event-location.js"
 
+const client = new pg.Client(BDConfig);
+client.connect();
 
 export default class EventLocationRepository{
-    constructor(){
-        const { Client } = pg;
-        this.DBClient = new Client(BDConfig)
-        this.DBClient.connect()
+    async getEventLocations(id_user, limit, offset){
+        var query = `SELECT * FROM event_locations WHERE id_creator_user = ${id_user} limit ${limit} offset ${offset}`;
+        const {rows} = await client.query(query)
+        return rows
     }
-    async GetEventLocations(limit, offset){
-        var query = `SELECT id, id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user FROM event_locations limit ${limit} offset ${offset}`;
-        const values = await client.query(query);
-        return values;
+    async getEventLocationById(id){
+        var query = `SELECT * FROM event_locations WHERE id = ${id} and id_creator_user = ${id_user}`;
+        const {rows} = await client.query(query)
+        return rows
     }
-    async GetEventLocationById(id){
-        var query = `SELECT id, id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user FROM event_locations WHERE id = ${id}`;
-        const values = await client.query(query);
-        return values;
-    }
-    async CrearEventLocation(eventLocation){
-        const query = ` INSERT INTO event_location (id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+    async crearEventLocation(eventLocation){
+        const query = ` INSERT INTO event_locations (id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
         const values = [
             eventLocation.id_location,
             eventLocation.name,
@@ -32,16 +28,21 @@ export default class EventLocationRepository{
         ];
         try {
             const res = validateEventLocation(eventLocation);
-            res = await client.query(query, values);
-            return res.rows[0];
+            if (res !== eventLocation) {
+                return res
+            }
+            else{
+                const res = await client.query(query, values);
+                return res.rowCount;
+            }
         } catch (error) {
             console.error('Error ejecutando la consulta', error);
             throw error;
         }
     }
-    async UpdateEventLocation(eventLocation){
+    async updateEventLocation(eventLocation){
         const query = `
-        UPDATE event_location
+        UPDATE event_locations
         SET id_location = $1, name = $2, full_address = $3, max_capacity = $4, latitude = $5, longitude = $6
         WHERE id = $7 AND id_creator_user = $8;
         `;
@@ -57,22 +58,27 @@ export default class EventLocationRepository{
         ];
         try {
             const res = validateEventLocation(eventLocation);
-            res = await client.query(query, values);
-            return res.rows[0];
+            if (res !== eventLocation) {
+                return res
+            }
+            else{
+                const res = await client.query(query, values);
+                return res.rowCount;
+            }
         } catch (error) {
             console.error('Error ejecutando la consulta', error);
             throw error;
         }
     }
-    async DeleteEventLocation(id, id_creator_user){
+    async deleteEventLocation(id, id_creator_user){
         const query = `
-        DELETE FROM event_location
+        DELETE FROM event_locations
         WHERE id = $1 AND id_creator_user = $2
         `;
         const values = [id, id_creator_user];
         try {
             const res = await client.query(query, values);
-            return res.rows[0];
+            return res.rowCount;
         } catch (error) {
             console.error('Error ejecutando la consulta', error.stack);
             throw error;

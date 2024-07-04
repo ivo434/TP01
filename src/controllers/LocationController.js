@@ -23,8 +23,8 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const location = await locationService.getLocationById(req.params.id);
-        if (location === "404") {
-            res.status(location).json("ID inexistente")
+        if (!location) {
+            res.status(404).json("ID inexistente")
         }
         res.status(200).json(location);
     } catch (error) {

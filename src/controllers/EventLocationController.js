@@ -1,31 +1,39 @@
 import express from 'express';
 import EventLocationService from '../services/eventlocation-services.js';
-import {AuthMiddleware} from '../utils/token.js';
+import { AuthMiddleware } from '../utils/token.js';
 
 const router = express.Router();
 const eventLocationService = new EventLocationService();
-router.get('/', async (req, res) => {
-    const { limit, offset } = req.query;
+
+router.get('/', AuthMiddleware, async (req, res) => {
+    let { limit, offset } = req.query;
+    limit = pagination.parseLimit(limit);
+    offset = pagination.parseOffset(offset);
     try {
-        const events = await eventLocationService.getEventLocations(limit, offset);
-        res.json(events);
+        const collection = await eventLocationService.getEventLocations(req.user.id, limit, offset);
+        const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
+        res.status(200).json({
+            paginacion: paginatedResponse
+        });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-router.get('/:id', async (req, res) => {
+
+router.get('/:id', AuthMiddleware, async (req, res) => {
     try {
-        const event = await eventLocationService.getEventLocationById(req.params.id);
+        const event = await eventLocationService.getEventLocationById(req.params.id, req.user.id);
+        if (!event) {
+            return res.status(404).json({ error: 'El event_location no existe o no pertenece al usuario autenticado.' });
+        }
         res.json(event);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-router.post('/', async (req, res) => {
-    const token = req.headers.authorization;
+
+router.post('/', AuthMiddleware, async (req, res) => {
     const { id_location, name, full_address, max_capacity, latitude, longitude } = req.body;
-    const payload = decryptToken(token);
-    const id_creator_user = payload.id;
     const newEventLocation = new EventLocation(
         null,
         id_location,
@@ -34,21 +42,23 @@ router.post('/', async (req, res) => {
         max_capacity,
         latitude,
         longitude,
-        id_creator_user
+        req.user.id
     );
     try {
-        const event = await eventLocationService.CrearEventLocation(newEventLocation);
-        res.json(event);
+        const event = await eventLocationService.crearEventLocation(newEventLocation);
+        if (event !== "") {
+            res.status(400).json(event);
+        } else {
+            res.status(200).json(event);
+        }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-router.put('/', async (req, res) => {
-    const token = req.headers.authorization;
+
+router.put('/', AuthMiddleware, async (req, res) => {
     const { id, id_location, name, full_address, max_capacity, latitude, longitude } = req.body;
-    const payload = decryptToken(token);
-    const id_creator_user = payload.id;
-    const newEventLocation = new EventLocation (
+    const newEventLocation = new EventLocation(
         id,
         id_location,
         name,
@@ -56,20 +66,25 @@ router.put('/', async (req, res) => {
         max_capacity,
         latitude,
         longitude,
-        id_creator_user
-    )
+        req.user.id
+    );
     try {
-        const event = await eventLocationService.UpdateEventLocation(newEventLocation);
-        res.json(event);
+        const event = await eventLocationService.updateEventLocation(newEventLocation);
+        if (event !== "") {
+            res.status(400).json(event);
+        } else {
+            res.status(200).json(event);
+        }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-router.delete('/:id', async (req, res) => {
+
+router.delete('/:id', AuthMiddleware, async (req, res) => {
     const id = req.params.id;
     const id_creator_user = req.user.id;
     try {
-        const deletedEventLocation = await deleteEventLocation(id, id_creator_user);
+        const deletedEventLocation = await eventLocationService.deleteEventLocation(id, id_creator_user);
         if (!deletedEventLocation) {
             return res.status(404).json({ error: 'El event_location no existe o no pertenece al usuario autenticado.' });
         }
@@ -78,4 +93,5 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar el evento' });
     }
 });
+
 export default router;

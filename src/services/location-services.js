@@ -1,9 +1,9 @@
 import LocationRepository from "../repositories/location-repository.js";
 const locationRepository = new LocationRepository();
 export default class LocationService {
-    async GetAllLocations(limit, offset){
+    async getAllLocations(limit, offset){
         try {
-            return await locationRepository.GetAllLocations(limit, offset);
+            return await locationRepository.getAllLocations(limit, offset);
         } catch (error) {
             console.error('Error in GetAllLocations:', error);
             throw error;
@@ -12,12 +12,7 @@ export default class LocationService {
     async getLocationById(id) {
         try {
             const location = await locationRepository.getLocationById(id);
-            if (id === null) {
-                return "404"
-            }
-            else{
-                return location;
-            }
+            return location
         } catch (error) {
             console.error('Error in getProvinciaById:', error);
             throw error;
@@ -26,12 +21,7 @@ export default class LocationService {
     async getEventLocationsByLocationId(user_id, location_id, limit, offset){
         try{
             const EventLocations = await locationRepository.getEventLocationsByLocationId(user_id, location_id, limit, offset)
-            if (location_id === null) {
-                return "404"
-            }
-            else{
-                return EventLocations;
-            }
+            return EventLocations
         } catch (error) {
             console.error('Error in GetEventLocationsByLocationId:', error);
             throw error;
