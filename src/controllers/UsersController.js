@@ -7,7 +7,7 @@ const userService = new UserService();
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const verif = verificacionLogin(username);
-    if (!verif) {
+    if (verif != true) {
         return res.status(400).send({
             success: false,
             message: "El email es invalido.",
@@ -21,11 +21,11 @@ router.post("/login", async (req, res) => {
             if (token != null) {
                 return res.status(200).send({
                     success: true,
-                    message: "User Founded",
+                    message: "User Logged",
                     token: token
                 });   
             } else {
-                return res.status(400).send({
+                return res.status(401).send({
                     success: false,
                     message: "Usuario o clave inválida.",
                     token: ""
@@ -42,7 +42,7 @@ router.post("/login", async (req, res) => {
 router.post("/register", async (req, res) => {
     const { first_name, last_name, username, password } = req.body;
     const checkIn = verificadorDeRegistro(first_name, last_name, username, password);
-    if(checkIn){
+    if(checkIn === true){
         const id = await userService.crearUsuario(first_name, last_name, username, password)
         const user = [{
             id: id,
@@ -59,15 +59,19 @@ router.post("/register", async (req, res) => {
         });
     } else {
         return res.status(400).send({
-            message: 'Error registering user',
+            checkIn
         });
     }
 });
 
 const verificadorDeRegistro = (first_name, last_name, username, password) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!first_name || !last_name){
-        return "El nombre y apellido son obligatorios";
+    console.log(first_name.length)
+    if (first_name === undefined || last_name === undefined || username === undefined || password === undefined) {
+        return "Valores insuficientes"
+    }
+    else if(first_name.length < 3 || last_name.length < 3){
+        return "El nombre y apellido son obligatorios y tienen que tener al menos 3 caracteres";
     }
     else if(!regex.test(username)){
         return "El formato de correo electrónico no es válido";

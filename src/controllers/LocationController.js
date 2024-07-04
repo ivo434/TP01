@@ -1,31 +1,47 @@
 import express from 'express';
 import LocationService from '../services/location-services.js';
+import { Pagination } from '../utils/paginacion.js';
+import { AuthMiddleware } from '../utils/token.js';
 
+const pagination = new Pagination();
 const router = express.Router();
 const locationService = new LocationService();
 router.get('/', async (req, res) => {
-    const { limit, offset } = req.query;
+    let { limit, offset } = req.query;
+    limit = pagination.parseLimit(limit)
+    offset = pagination.parseOffset(offset)
     try {
-        const events = await locationService.getAllLocations(limit, offset);
-        res.json(events);
+        const collection = await locationService.getAllLocations( limit, offset);
+        const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
+        res.status(200).json({
+            paginacion: paginatedResponse
+        });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 router.get('/:id', async (req, res) => {
     try {
-        const event = await locationService.getLocationById(req.params.id);
-        res.json(event);
+        const location = await locationService.getLocationById(req.params.id);
+        if (location === "404") {
+            res.status(location).json("ID inexistente")
+        }
+        res.status(200).json(location);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-router.get('/:id', async (req, res) => {
-    const { limit, offset } = req.query;
-    try{
-        const events = await locationService.GetEventLocationsByLocationId(req.params.id, limit, offset)
-        res.json(events)
-    } catch(error){
+router.get('/:id/event-location', AuthMiddleware, async (req, res) => {
+    let { limit, offset } = req.query;
+    limit = pagination.parseLimit(limit)
+    offset = pagination.parseOffset(offset)
+    try {
+        const collection = await locationService.getEventLocationsByLocationId(req.user.id, req.params.id, limit, offset)
+        const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
+        res.status(200).json({
+            paginacion: paginatedResponse
+        });
+    } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });

@@ -12,16 +12,26 @@ export default class LocationService {
     async getLocationById(id) {
         try {
             const location = await locationRepository.getLocationById(id);
-            return location;
+            if (id === null) {
+                return "404"
+            }
+            else{
+                return location;
+            }
         } catch (error) {
             console.error('Error in getProvinciaById:', error);
             throw error;
         }
     }
-    async GetEventLocationsByLocationId(location_id, limit, offset){
+    async getEventLocationsByLocationId(user_id, location_id, limit, offset){
         try{
-            const EventLocations = await locationRepository.GetEventLocationsByLocationId(location_id, limit, offset)
-            return EventLocations
+            const EventLocations = await locationRepository.getEventLocationsByLocationId(user_id, location_id, limit, offset)
+            if (location_id === null) {
+                return "404"
+            }
+            else{
+                return EventLocations;
+            }
         } catch (error) {
             console.error('Error in GetEventLocationsByLocationId:', error);
             throw error;

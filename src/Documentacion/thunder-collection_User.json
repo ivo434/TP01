@@ -1,0 +1,180 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "User",
+    "collectionId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+    "dateExported": "2024-07-04T20:33:13.265Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "fbf5b76f-aa6d-4533-838b-081b1f61f9d4",
+            "colId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+            "containerId": "",
+            "name": "Login",
+            "url": "http://localhost:3000/api/user/login",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-07-04T20:12:38.104Z",
+            "modified": "2024-07-04T20:13:59.261Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "*/*",
+                    "isDisabled": true
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "Thunder Client (https://www.thunderclient.com)",
+                    "isDisabled": true
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"username\": \"polshu@polshu.com.ar\",\n  \"password\": \"pablito\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "c4f668ee-0055-40e5-8d15-866ec069e188",
+            "colId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+            "containerId": "",
+            "name": "Login400",
+            "url": "http://localhost:3000/api/user/login",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-07-04T20:17:11.403Z",
+            "modified": "2024-07-04T20:17:57.479Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "*/*",
+                    "isDisabled": true
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "Thunder Client (https://www.thunderclient.com)",
+                    "isDisabled": true
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"username\": \"polshupolshucoar\",\n  \"password\": \"pablito\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "b8bb9ebb-1665-434b-986e-dc86e590f6b2",
+            "colId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+            "containerId": "",
+            "name": "Login401",
+            "url": "http://localhost:3000/api/user/login",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-07-04T20:19:00.343Z",
+            "modified": "2024-07-04T20:19:39.668Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "*/*",
+                    "isDisabled": true
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "Thunder Client (https://www.thunderclient.com)",
+                    "isDisabled": true
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"username\": \"polshu@polshuc.oar\",\n  \"password\": \"pablito\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "4fa24f5b-a743-4d60-99db-db9d49113b02",
+            "colId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+            "containerId": "",
+            "name": "Register200",
+            "url": "http://localhost:3000/api/user/register",
+            "method": "POST",
+            "sortNum": 45000,
+            "created": "2024-07-04T20:20:20.706Z",
+            "modified": "2024-07-04T20:22:16.188Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\r\n\r\n    \"first_name\": \"Urias\",\r\n\r\n    \"last_name\" : \"Cyberman\",\r\n\r\n    \"username\"  : \"urielcw54@gmail.com\",\r\n\r\n    \"password\"  : \"palosenlarueda\"\r\n\r\n  }",
+                "form": []
+            }
+        },
+        {
+            "_id": "daa7ff8d-76a8-4f5e-bae7-e7384f612056",
+            "colId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+            "containerId": "",
+            "name": "Register400 1",
+            "url": "http://localhost:3000/api/user/register",
+            "method": "POST",
+            "sortNum": 55000,
+            "created": "2024-07-04T20:22:43.143Z",
+            "modified": "2024-07-04T20:32:28.920Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n\n    \"first_name\": \"Urasd\",\n\n    \"last_name\" : \"Cyasd\",\n\n    \"username\"  : \"urielcw54@gmail.com\",\n    \"password\" : \"\"\n  }",
+                "form": []
+            }
+        },
+        {
+            "_id": "5534e039-f71e-48fb-a536-135f50a7fbf2",
+            "colId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+            "containerId": "",
+            "name": "Register400 2",
+            "url": "http://localhost:3000/api/user/register",
+            "method": "POST",
+            "sortNum": 65000,
+            "created": "2024-07-04T20:22:44.438Z",
+            "modified": "2024-07-04T20:32:45.883Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n\n    \"first_name\": \"Urias\",\n\n    \"last_name\" : \"Cy\",\n\n    \"username\"  : \"urielcw54@gmail.com\",\n\n    \"password\"  : \"palosenlarueda\"\n\n  }",
+                "form": []
+            }
+        },
+        {
+            "_id": "908a1b1c-a943-450a-80bf-73180154911f",
+            "colId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+            "containerId": "",
+            "name": "Register400 3",
+            "url": "http://localhost:3000/api/user/register",
+            "method": "POST",
+            "sortNum": 75000,
+            "created": "2024-07-04T20:22:45.603Z",
+            "modified": "2024-07-04T20:32:49.624Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n\n    \"first_name\": \"Urias\",\n\n    \"last_name\" : \"Cyberman\",\n\n    \"username\"  : \"urielcw54gmail.com\",\n\n    \"password\"  : \"palosenlarueda\"\n\n  }",
+                "form": []
+            }
+        },
+        {
+            "_id": "e4ec4502-e944-46da-a211-9256f2b27858",
+            "colId": "df36d172-dafa-4197-a130-5c6a5ee9e2d8",
+            "containerId": "",
+            "name": "Register400 4",
+            "url": "http://localhost:3000/api/user/register",
+            "method": "POST",
+            "sortNum": 85000,
+            "created": "2024-07-04T20:32:53.125Z",
+            "modified": "2024-07-04T20:33:04.518Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n\n    \"first_name\": \"Urias\",\n\n    \"last_name\" : \"Cyberman\",\n\n    \"username\"  : \"urielcw54gmail.com\"\n\n  }",
+                "form": []
+            }
+        }
+    ],
+    "ref": "5f_w6omS8xCg3TMtNcZsPAfqevHDQVAXTLUUmWhBjt73nFvylCYh3LYncpNFxgEsZC8gqWYYk70sY4hvrUHj3g"
+}

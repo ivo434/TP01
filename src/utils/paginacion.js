@@ -3,11 +3,11 @@ import "dotenv/config";
 const BASE_URL = process.env.BASE_URL;
 
 export class PaginationDto {
-  constructor(limit, offset, nextPage, total) {
+  constructor(limit, offset, nextPage, collection) {
     this.limit = limit;
     this.offset = offset;
     this.nextPage = nextPage;
-    this.total = total;
+    this.collection = collection;
   }
 }
 
@@ -25,12 +25,12 @@ export class Pagination {
     return !isNaN(parseInt(offset)) ? parseInt(offset) : 0; // No modificar, ya que esta sería la primera página
   }
 
-  buildPaginationDto(limit, currentOffset, total, path, basePath) {
+  buildPaginationDto(limit, currentOffset, collection, path, basePath) {
     const nextPage =
-      limit !== -1 && limit + currentOffset < total
+      limit !== -1 && limit + currentOffset < collection
         ? this.buildNextPage(path, limit, currentOffset, basePath)
         : null;
-    return new PaginationDto(limit, currentOffset, nextPage, total);
+    return new PaginationDto(limit, currentOffset, nextPage, collection);
   }
 
   buildNextPage(path, limit, currentOffset, basePath) {
@@ -51,7 +51,7 @@ export class Pagination {
 // pagination: {
 //     limit: parsedLimit ,
 //     offset: parsedOffset,
-//     nextPage:((parsedOffset + 1) * parsedLimit <= totalCount) ? `${ process.env.BASE_URL} / ${ path } ?limit= ${ parsedLimit } &offset= ${ parsedOffset + 1 }${ ( eventName ) ? `&eventName= ${ eventName } ` : null}${ ( eventCategory ) ? `&eventCategory= ${ eventCategory } ` : null} ${ ( eventDate ) ? `&eventDate= ${ eventDate } ` : null}${ ( eventTag ) ? `&eventTag= ${ eventTag } ` : null} ` : null , 
-//     total: totalCount
+//     nextPage:((parsedOffset + 1) * parsedLimit <= collectionCount) ? `${ process.env.BASE_URL} / ${ path } ?limit= ${ parsedLimit } &offset= ${ parsedOffset + 1 }${ ( eventName ) ? `&eventName= ${ eventName } ` : null}${ ( eventCategory ) ? `&eventCategory= ${ eventCategory } ` : null} ${ ( eventDate ) ? `&eventDate= ${ eventDate } ` : null}${ ( eventTag ) ? `&eventTag= ${ eventTag } ` : null} ` : null , 
+//     collection: collectionCount
 //     }
 // }

@@ -3,11 +3,9 @@ import { BDConfig } from "../BD/bd.js";
 import Event from "../entities/event.js";
 import CrudRepository from "./CRUD.js";
 
-
 const crudRepository = new CrudRepository()
 const client = new pg.Client(BDConfig);
 client.connect();
-
 
 export default class EventRepository{
     async getListadoEventos(limit, offset) {

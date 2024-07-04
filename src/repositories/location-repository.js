@@ -1,25 +1,25 @@
 import pg from "pg";
 import { BDConfig } from "../BD/bd.js";
 
+const client = new pg.Client(BDConfig);
+client.connect();
+
 export default class LocationRepository{
-    constructor(){
-        const { Client } = pg;
-        this.DBClient = new Client(BDConfig)
-        this.DBClient.connect()
+    async getAllLocations(limit, offset){
+        var query = `SELECT * FROM locations limit ${limit} offset ${offset}`
+        const {rows} = await client.query(query)
+        return rows
     }
-    async GetAllLocations(limit,offset){
-        var query = `SELECT id, name, id_province, latitude, longitude FROM locations limit ${limit} offset ${offset}`
-        var values = await this.DBClient.query(query)
-        return values
+    async getLocationById(id){
+        var query = `SELECT * FROM locations WHERE id = ${id}`
+        const {rows} = await client.query(query)
+        return rows
     }
-    async GetLocationById(id){
-        var query = `SELECT id, name, id_province, latitude, longitude FROM locations WHERE id = ${id}`
-        var values = await this.DBClient.query(query)
-        return values
-    }
-    async GetEventLocationsByLocationId(location_id, limit, offset){
-        var query = `SELECT id, id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user FROM event_locations WHERE locations.id = ${location_id} INNER JOIN locations ON event_locations.id_location = locations.id limit ${limit} offset ${offset}`
-        var values = await this.DBClient.query(query)
-        return values
+    async getEventLocationsByLocationId(user_id, location_id, limit, offset){
+        var query = `select * FROM event_locations INNER JOIN locations ON 
+        event_locations.id_location = locations.id WHERE locations.id = ${location_id}
+         and event_locations.id_creator_user = ${user_id} limit ${limit} offset ${offset}`
+        const {rows} = await client.query(query)
+        return rows
     }
 }
