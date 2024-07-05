@@ -277,8 +277,13 @@ export default class EventRepository{
                 query = query.slice(0,-4);
             }
             console.log(query)
-            const {rows} = await client.query(query);
-            return rows;
+            const values = await client.query(query)
+            if (values.rowCount >= 1) {
+                return values.rows
+            }
+            else{
+                return values.rowCount
+            }
     }
     async CrearEvento(evento){ // display_order >= 0
         var query = `INSERT INTO events (name, description, id_event_category, id_event_location, 

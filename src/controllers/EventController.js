@@ -72,7 +72,11 @@ router.get('/:id/enrollment', async (req, res) => {
     const { first_name, last_name, username, attended, rating } = req.query;
     try {
         const participantes = await eventService.listaParticipantes(req.params.id, first_name, last_name, username, attended, rating);
-        res.status(200).json(participantes);
+        if (!participantes) {
+            return res.status(404).json({ error: 'el id sea inexistente' });
+        } else {
+            res.status(200).json(participantes);
+        }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
