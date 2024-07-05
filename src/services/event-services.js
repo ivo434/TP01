@@ -132,7 +132,7 @@ class EventService {
       }
       async removeUserFromEvent(eventId, userId){
         try {
-            await eventRepository.removeUserFromEvent(eventId, userId); // NO ESTA HECHO
+            return await eventRepository.removeUserFromEvent(eventId, userId); // NO ESTA HECHO
         } catch (error) {
             console.error('Error in enrollUserToEvent', error);
             throw error;

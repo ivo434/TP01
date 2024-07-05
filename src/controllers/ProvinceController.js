@@ -1,6 +1,7 @@
 import express from "express";
 import ProvinceService from "../services/province-services.js"
 import { Pagination } from "../utils/paginacion.js";
+import Province from "../entities/province.js"
 
 const router = express.Router();
 const pagination = new Pagination();
@@ -35,8 +36,8 @@ router.get('/', async (req, res) => {
   limit = pagination.parseLimit(limit)
   offset = pagination.parseOffset(offset)
   try {
-    const provincias = await provinceService.GetAllProvincias(limit, offset);
-    const paginatedResponse = pagination.buildPaginationDto(limit, offset, provincias, req.path);
+    const collection = await provinceService.GetAllProvincias(limit, offset);
+    const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
     res.status(200).json({
       paginacion: paginatedResponse
     });
@@ -47,13 +48,15 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const { name, full_name, latitude, longitude, display_order } = req.body;
+  const newProvince = new Province(null, name, full_name, latitude, longitude, display_order);
   try {
-    if (display_order === undefined || display_order >= 0) {
-      const provincia = await provinceService.CrearProvincia(name, full_name, latitude, longitude, display_order);
-      res.status(201).json(provincia);
-    } else {
-      res.status(401).json({ mensaje: "display_order tiene que ser mayor o igual a 0" });
-    }
+      const provincia = await provinceService.CrearProvincia(newProvince);
+      verif = verificacionProvince1(provincia)
+      if (verif) {
+        res.status(201).json(provincia);
+      } else {
+        res.status(400).json(verif)
+      }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -73,16 +76,59 @@ router.delete('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { name, full_name, latitude, longitude, display_order } = req.body;
+  const newProvince = new Province(req.params.id, name, full_name, latitude, longitude, display_order);
   try {
-    if (display_order >= 0) {
-      const provincia = await provinceService.EditarProvincia(req.params.id, name, full_name, latitude, longitude, display_order);
+    const provincia = await provinceService.EditarProvincia(newProvince);
+    const verif = verificacionProvince2(provincia)
+    if (verif) {
       res.status(200).json(provincia);
     } else {
-      res.status(401).json({ mensaje: "display_order tiene que ser mayor o igual a 0" });
+      res.status(400).json(verif)
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
+function verificacionProvince1(provincia){
+  var values = true
+  if (provincia.name !== undefined) {
+    if (provincia.name.length < 3) {
+      values += "Nombre menor a 3 "
+    }
+  } else {
+    values += "Nombre inexistente "
+  }
+  if (provincia.latitude !== undefined) {
+    if (!Number.isInteger(provincia.latitude)) {
+      values += "Latitud no es un entero "
+    }
+  }
+  if (provincia.longitude !== undefined) {
+    if (!Number.isInteger(provincia.longitude)) {
+      values += "Longitud no es un entero "
+    }
+  }
+  return values
+}
+function verificacionProvince2(provincia){
+  var values = true
+  if (provincia.name !== undefined) {
+    if (provincia.name.length < 3) {
+      values += "Nombre menor a 3 "
+    }
+  }
+  if (provincia.latitude !== undefined) {
+    if (!Number.isInteger(provincia.latitude)) {
+      values += "Latitud no es un entero "
+    }
+  }
+  if (provincia.longitude !== undefined) {
+    if (!Number.isInteger(provincia.longitude)) {
+      values += "Longitud no es un entero "
+    }
+  }
+  return values
+}
 
 export default router;

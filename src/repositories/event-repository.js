@@ -62,15 +62,15 @@ export default class EventRepository{
                     'name', tags.name
                 ) 
             FROM tags
-            INNER JOIN event_tags ON tags.id = event_tags.id_tag
+            LEFT JOIN event_tags ON tags.id = event_tags.id_tag
             WHERE event_tags.id_event = events.id
             ) AS tags
     FROM events
-    INNER JOIN users ON events.id_creator_user = users.id
-    INNER JOIN event_categories ON events.id_event_category = event_categories.id
-    INNER JOIN event_locations ON events.id_event_location = event_locations.id
-    INNER JOIN locations ON event_locations.id_location = locations.id
-    INNER JOIN provinces ON locations.id_province = provinces.id`;
+    LEFT JOIN users ON events.id_creator_user = users.id
+    LEFT JOIN event_categories ON events.id_event_category = event_categories.id
+    LEFT JOIN event_locations ON events.id_event_location = event_locations.id
+    LEFT JOIN locations ON event_locations.id_location = locations.id
+    LEFT JOIN provinces ON locations.id_province = provinces.id`;
         query += ` LIMIT ${limit} OFFSET ${offset}`
         const {rows} = await client.query(query);
         return rows;
@@ -129,18 +129,23 @@ export default class EventRepository{
                     'name', tags.name
                 ) 
             FROM tags
-            INNER JOIN event_tags ON tags.id = event_tags.id_tag
+            LEFT JOIN event_tags ON tags.id = event_tags.id_tag
             WHERE event_tags.id_event = events.id
             ) AS tags
     FROM events
-    INNER JOIN users ON events.id_creator_user = users.id
-    INNER JOIN event_categories ON events.id_event_category = event_categories.id
-    INNER JOIN event_locations ON events.id_event_location = event_locations.id
-    INNER JOIN locations ON event_locations.id_location = locations.id
-    INNER JOIN provinces ON locations.id_province = provinces.id
+    LEFT JOIN users ON events.id_creator_user = users.id
+    LEFT JOIN event_categories ON events.id_event_category = event_categories.id
+    LEFT JOIN event_locations ON events.id_event_location = event_locations.id
+    LEFT JOIN locations ON event_locations.id_location = locations.id
+    LEFT JOIN provinces ON locations.id_province = provinces.id
         WHERE events.id = ${id}`;
-        const {rows} = await client.query(query);
-        return rows;
+        const values = await client.query(query)
+        if (values.rowCount >= 1) {
+            return values.rows
+        }
+        else{
+            return values.rowCount
+        }
     }
     async busquedaEventos(name, category, startdate, tag, limit, offset) {
         var query = `SELECT 
@@ -196,17 +201,17 @@ export default class EventRepository{
                     'name', tags.name
                 ) 
             FROM tags
-            INNER JOIN event_tags ON tags.id = event_tags.id_tag
+            LEFT JOIN event_tags ON tags.id = event_tags.id_tag
             WHERE event_tags.id_event = events.id
             ) AS tags
     FROM events
-    INNER JOIN users ON events.id_creator_user = users.id
-    INNER JOIN event_categories ON events.id_event_category = event_categories.id
-    INNER JOIN event_locations ON events.id_event_location = event_locations.id
-    INNER JOIN locations ON event_locations.id_location = locations.id
-    INNER JOIN provinces ON locations.id_province = provinces.id
-    INNER JOIN event_tags et ON events.id = et.id_event
-    INNER JOIN tags t ON et.id_tag = t.id
+    LEFT JOIN users ON events.id_creator_user = users.id
+    LEFT JOIN event_categories ON events.id_event_category = event_categories.id
+    LEFT JOIN event_locations ON events.id_event_location = event_locations.id
+    LEFT JOIN locations ON event_locations.id_location = locations.id
+    LEFT JOIN provinces ON locations.id_province = provinces.id
+    LEFT JOIN event_tags et ON events.id = et.id_event
+    LEFT JOIN tags t ON et.id_tag = t.id
         WHERE `;
         if (name != null) {
             query += `events.name ILIKE '%${name}%' AND `;
@@ -250,7 +255,7 @@ export default class EventRepository{
             ee.rating
             FROM
             event_enrollments ee
-            INNER JOIN users u
+            LEFT JOIN users u
 			ON U.id = ee.id_user
             WHERE ee.id_event = ${id_event} AND `
             if (first_name != null) {
@@ -351,8 +356,9 @@ export default class EventRepository{
             eventEnrollment.rating
         ];
         try {
-            await client.query(query, values);
             console.log('Usuario inscrito exitosamente en el evento');
+            const res = await client.query(query, values);
+            return res.rowCount;
         } catch (error) {
             console.error('Error al inscribir al usuario en el evento', error.stack);
             throw error;
@@ -365,8 +371,8 @@ export default class EventRepository{
         `;
         const values = [eventEnrollmentId, userId];
         try {
-            await client.query(query, values);
-            console.log('Usuario removido exitosamente del evento');
+            const res = await client.query(query, values);
+            return res.rowCount;
         } catch (error) {
             console.error('Error al remover al usuario del evento', error.stack);
             throw error;

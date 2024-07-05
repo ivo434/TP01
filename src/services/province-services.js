@@ -4,9 +4,9 @@ const provinceRepository = new ProvinceRepository();
 
 class ProvinceService {
 
-    async CrearProvincia(name, full_name, latitude, longitude, display_order) {
+    async CrearProvincia(provincia) {
         try {
-            await provinceRepository.CrearProvincia(name, full_name, latitude, longitude, display_order);
+            await provinceRepository.CrearProvincia(provincia);
             return { message: 'Provincia creada correctamente' };
         } catch (error) {
             console.error('Error in crearProvincia:', error);
@@ -24,9 +24,9 @@ class ProvinceService {
         }
     }
 
-    async EditarProvincia(id, name, full_name, latitude, longitude, display_order) {
+    async EditarProvincia(provincia) {
         try {
-            await provinceRepository.EditarProvincia(id, name, full_name, latitude, longitude, display_order);
+            await provinceRepository.EditarProvincia(provincia);
             return { message: 'Provincia actualizada correctamente?' };
         } catch (error) {
             console.error('Error in editarProvincia:', error);

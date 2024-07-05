@@ -139,42 +139,47 @@ router.post('/:id/enrollment/', AuthMiddleware, async (req, res) => {
     let verif = true;
     const enrollments = await crudRepository.Get("select * from event_enrollments where id_event = $1", [req.params.id]);
     const event = await eventService.getEvento(req.params.id);
-    const newEventEnrollment = new EventEnrollment(
-        null,
-        req.params.id,
-        req.user.id,
-        event[0].description,
-        fecha,
-        false,
-        null,
-        null
-    );
-    console.log(newEventEnrollment);
-    if (enrollments.length >= event[0].max_assistance) {
-        return res.status(400).json({ error: 'La capacidad máxima de registrados para el evento ha sido alcanzada' });
-    }
-    const eventStartDate = new Date(event[0].start_date);
-    console.log(event[0]);
-    if (eventStartDate <= fecha) {
-        return res.status(400).json({ error: 'No es posible registrarse a un evento que ya ha sucedido o que se realiza hoy' });
-    }
-
-    if (!event[0].enabled_for_enrollment) {
-        return res.status(400).json({ error: 'El evento no está habilitado para la inscripción' });
-    }
-    enrollments.forEach(item => {
-        if (item.id_user === req.user.id) {
-            verif = false;
+    console.log(event)
+    if ((event !== 0 && event !== undefined) && enrollments !== undefined) {
+        const newEventEnrollment = new EventEnrollment(
+            null,
+            req.params.id,
+            req.user.id,
+            event[0].description,
+            fecha,
+            false,
+            null,
+            null
+        );
+        console.log(newEventEnrollment);
+        if (enrollments.length >= event[0].max_assistance) {
+            return res.status(400).json({ error: 'La capacidad máxima de registrados para el evento ha sido alcanzada' });
         }
-    });
-    if (!verif) {
-        return res.status(400).json({ error: 'El usuario ya se encuentra registrado en el evento' });
-    }
-    try {
-        await eventService.enrollUserToEvent(newEventEnrollment);
-        res.status(201).json({ message: 'Usuario registrado exitosamente en el evento' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        const eventStartDate = new Date(event[0].start_date);
+        console.log(event[0]);
+        if (eventStartDate <= fecha) {
+            return res.status(400).json({ error: 'No es posible registrarse a un evento que ya ha sucedido o que se realiza hoy' });
+        }
+    
+        if (!event[0].enabled_for_enrollment) {
+            return res.status(400).json({ error: 'El evento no está habilitado para la inscripción' });
+        }
+        enrollments.forEach(item => {
+            if (item.id_user === req.user.id) {
+                verif = false;
+            }
+        });
+        if (!verif) {
+            return res.status(400).json({ error: 'El usuario ya se encuentra registrado en el evento' });
+        }
+        try {
+            const verif2 = await eventService.enrollUserToEvent(newEventEnrollment);
+            res.status(201).json({ message: 'Usuario registrado exitosamente en el evento', verif2 });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }   
+    } else {
+        return res.status(404).json({ error: 'el id sea inexistente' });
     }
 });
 
@@ -183,24 +188,28 @@ router.delete('/:id/enrollment/', AuthMiddleware, async (req, res) => {
     const event = await eventService.getEvento(req.params.id);
     let verif = true;
     const fecha = new Date();
-    enrollments.forEach(item => {
-        if (item.id_user === req.user.id) {
-            verif = false;
+    if ((event !== 0 && event !== undefined) && enrollments !== undefined) {
+        enrollments.forEach(item => {
+            if (item.id_user === req.user.id) {
+                verif = false;
+            }
+        });
+        if (verif) {
+            return res.status(400).json({ error: 'El usuario no se encuentra registrado en el evento' });
         }
-    });
-    if (verif) {
-        return res.status(400).json({ error: 'El usuario no se encuentra registrado en el evento' });
-    }
-    const eventStartDate = new Date(event[0].start_date);
-    console.log(event[0]);
-    if (eventStartDate <= fecha) {
-        return res.status(400).json({ error: 'No es posible eliminarse de un evento que ya ha sucedido o que se realiza hoy' });
-    }
-    try {
-        await eventService.removeUserFromEvent(req.params.id, req.user.id);
-        res.status(200).json({ message: 'Usuario removido exitosamente del evento' });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+        const eventStartDate = new Date(event[0].start_date);
+        console.log(event[0]);
+        if (eventStartDate <= fecha) {
+            return res.status(400).json({ error: 'No es posible eliminarse de un evento que ya ha sucedido o que se realiza hoy' });
+        }
+        try {
+            const verif2 = await eventService.removeUserFromEvent(req.params.id, req.user.id);
+            res.status(200).json({ message: 'Usuario removido exitosamente del evento', verif2 });
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    } else {
+        return res.status(404).json({ error: 'el id sea inexistente' });
     }
 });
 

@@ -47,41 +47,45 @@ export default class EventLocationRepository{
     }
     async updateEventLocation(eventLocation) {
         var values = [];
-        const query = `
+        var query = `
         UPDATE event_locations
         SET `;
         let paramIndex = 1;
-        if (id_location != null) {
+        if (eventLocation.id_location != null) {
             query += `id_location = $${paramIndex}, `;
             paramIndex++;
             values.push(eventLocation.id_location);
         }
-        if (name != null) {
+        if (eventLocation.name != null) {
             query += `name = $${paramIndex}, `;
             paramIndex++;
             values.push(eventLocation.name);
         }
-        if (full_address != null) {
+        if (eventLocation.full_address != null) {
             query += `full_address = $${paramIndex}, `;
             paramIndex++;
             values.push(eventLocation.full_address);
         }
-        if (max_capacity != null) {
+        if (eventLocation.max_capacity != null) {
             query += `max_capacity = $${paramIndex}, `;
             paramIndex++;
             values.push(eventLocation.max_capacity);
         }
-        if (latitude != null) {
+        if (eventLocation.latitude != null) {
             query += `latitude = $${paramIndex}, `;
             paramIndex++;
             values.push(eventLocation.latitude);
         }
-        if (longitude != null) {
+        if (eventLocation.longitude != null) {
             query += `longitude = $${paramIndex}, `;
             paramIndex++;
             values.push(eventLocation.longitude);
         }
+        if (query.endsWith(', ')) {
+            query = query.slice(0, -2);
+        }
         query += ` WHERE id = $${paramIndex} AND id_creator_user = $${paramIndex + 1};`
+        console.log(query)
         values.push(eventLocation.id)
         values.push(eventLocation.id_creator_user)
         try {
@@ -90,6 +94,7 @@ export default class EventLocationRepository{
                 return res
             }
             else{
+                console.log(values)
                 const res = await client.query(query, values);
                 return res.rowCount;
             }
