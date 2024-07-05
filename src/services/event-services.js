@@ -53,11 +53,11 @@ class EventService {
             ];
             console.log(values)
             const max_capacity = await crudRepository.Get("SELECT max_capacity FROM event_locations WHERE id = $1", values);
-            console.log(max_capacity)
-            if (evento.name < 3 || evento.description < 3) {
+            console.log(max_capacity[0].max_capacity)
+            if (evento.name.length < 3 || evento.description.length < 3) {
                 return "Nombre menor a 3"
             }
-            else if (evento.max_assistance > max_capacity){
+            else if (evento.max_assistance > parseInt(max_capacity[0].max_capacity)){
                 return "Asistencia maxima mayor a capacidad maxima"
             }
             else if (evento.price < 0 || evento.duration_in_minutes < 0){
@@ -86,17 +86,36 @@ class EventService {
                 evento.id_event_location
             ];
             const max_capacity = await crudRepository.Get("SELECT max_capacity FROM event_locations WHERE id = $1", values);
-            if (evento.name != null && evento.description != null && evento.name < 3 || evento.description < 3) {
-                return "Nombre menor a 3"
+            var verif = "";
+            if (evento.name !== undefined) {
+                if (evento.name.length < 3) {
+                    verif = "Nombre menor a 3"
+                }
             }
-            else if (evento.max_assistance != null && evento.max_assistance > max_capacity){
-                return "Asistencia maxima mayor a capacidad maxima"
+            else if (evento.description !== undefined) {
+                if (evento.description.length < 3) {
+                    verif = "Descripcion menor a 3"
+                }
             }
-            else if (evento.price != null && evento.duration_in_minutes != null && evento.price < 0 || evento.duration_in_minutes < 0){
-                return "Precio y duracion menores a 0"
+            else if (evento.max_assistance !== undefined){
+                if (evento.max_assistance > parseInt(max_capacity[0].max_capacity)) {
+                    verif = "Asistencia maxima mayor a capacidad maxima"
+                }
             }
-            else {
+            else if (evento.price !== undefined){
+                if (evento.price < 0) {
+                    verif = "Precio menor a 0"
+                }
+            }
+            else if (evento.duration_in_minutes !== undefined) {
+                if (evento.duration_in_minutes < 0) {
+                    verif = "Duracion menor a 0"
+                }
+            }
+            if (verif === "") {
                 return await eventRepository.EditarEvento(id, evento)
+            } else{
+                return verif
             }
         } catch (error) {
             console.error('Error in EditarEvento:', error);

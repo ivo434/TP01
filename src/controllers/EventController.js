@@ -23,11 +23,9 @@ router.get('/', async (req, res) => {
         name = name.trim();
     }
     try {
-        const events = await eventService.busquedaEventos(name, category, startdate, tag, limit, offset);
-        const collection = await eventService.getListadoEventos(limit, offset);
+        const collection = await eventService.busquedaEventos(name, category, startdate, tag, limit, offset);
         const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
         res.status(200).json({
-            eventos: events,
             paginacion: paginatedResponse
         });
     } catch (error) {

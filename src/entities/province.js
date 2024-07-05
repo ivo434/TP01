@@ -1,10 +1,10 @@
 export default class Province{
     constructor(id,name,full_name,latitude,longitude,display_order){
-        this.Provinceid = id
-        this.Provincename = name
-        this.Provincefull_name = full_name
-        this.Provincelatitude = latitude
-        this.Provincelongitude = longitude
-        this.Provincedisplay_order = display_order
+        this.id = id
+        this.name = name
+        this.full_name = full_name
+        this.latitude = latitude
+        this.longitude = longitude
+        this.display_order = display_order
     }
 }

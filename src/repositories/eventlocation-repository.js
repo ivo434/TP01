@@ -10,10 +10,15 @@ export default class EventLocationRepository{
         const {rows} = await client.query(query)
         return rows
     }
-    async getEventLocationById(id){
+    async getEventLocationById(id, id_user){
         var query = `SELECT * FROM event_locations WHERE id = ${id} and id_creator_user = ${id_user}`;
-        const {rows} = await client.query(query)
-        return rows
+        const values =  await client.query(query);
+        if (values.rowsCount >= 1) {
+            return values.rows
+        }
+        else{
+            return values.rowCount
+        }
     }
     async crearEventLocation(eventLocation){
         const query = ` INSERT INTO event_locations (id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
@@ -40,22 +45,45 @@ export default class EventLocationRepository{
             throw error;
         }
     }
-    async updateEventLocation(eventLocation){
+    async updateEventLocation(eventLocation) {
+        var values = [];
         const query = `
         UPDATE event_locations
-        SET id_location = $1, name = $2, full_address = $3, max_capacity = $4, latitude = $5, longitude = $6
-        WHERE id = $7 AND id_creator_user = $8;
-        `;
-        const values = [
-            eventLocation.id_location,
-            eventLocation.name,
-            eventLocation.full_address,
-            eventLocation.max_capacity,
-            eventLocation.latitude,
-            eventLocation.longitude,
-            eventLocation.id,
-            eventLocation.id_creator_user
-        ];
+        SET `;
+        let paramIndex = 1;
+        if (id_location != null) {
+            query += `id_location = $${paramIndex}, `;
+            paramIndex++;
+            values.push(eventLocation.id_location);
+        }
+        if (name != null) {
+            query += `name = $${paramIndex}, `;
+            paramIndex++;
+            values.push(eventLocation.name);
+        }
+        if (full_address != null) {
+            query += `full_address = $${paramIndex}, `;
+            paramIndex++;
+            values.push(eventLocation.full_address);
+        }
+        if (max_capacity != null) {
+            query += `max_capacity = $${paramIndex}, `;
+            paramIndex++;
+            values.push(eventLocation.max_capacity);
+        }
+        if (latitude != null) {
+            query += `latitude = $${paramIndex}, `;
+            paramIndex++;
+            values.push(eventLocation.latitude);
+        }
+        if (longitude != null) {
+            query += `longitude = $${paramIndex}, `;
+            paramIndex++;
+            values.push(eventLocation.longitude);
+        }
+        query += ` WHERE id = $${paramIndex} AND id_creator_user = $${paramIndex + 1};`
+        values.push(eventLocation.id)
+        values.push(eventLocation.id_creator_user)
         try {
             const res = validateEventLocation(eventLocation);
             if (res !== eventLocation) {
@@ -87,17 +115,15 @@ export default class EventLocationRepository{
 }
 
 function validateEventLocation(data) {
-    if (!data.name || data.name.length < 3) {
+    console.log(data)
+    if (data.name.length < 3) {
         return 'El nombre debe tener al menos tres letras.';
     }
-    if (!data.full_address || data.full_address.length < 3) {
+    if (data.full_address.length < 3) {
         return 'La dirección debe tener al menos tres letras.';
     }
     if (data.max_capacity <= 0) {
         return 'La capacidad máxima debe ser un número positivo.';
-    }
-    if (!isValidLocationId(data.id_location)) {
-        return 'El id_location es inexistente.';
     }
     else {
         return data;

@@ -1,9 +1,12 @@
 import express from 'express';
 import EventLocationService from '../services/eventlocation-services.js';
+import EventLocation from "../entities/event-location.js"
+import {Pagination} from "../utils/paginacion.js"
 import { AuthMiddleware } from '../utils/token.js';
 
 const router = express.Router();
 const eventLocationService = new EventLocationService();
+const pagination = new Pagination();
 
 router.get('/', AuthMiddleware, async (req, res) => {
     let { limit, offset } = req.query;
@@ -46,10 +49,14 @@ router.post('/', AuthMiddleware, async (req, res) => {
     );
     try {
         const event = await eventLocationService.crearEventLocation(newEventLocation);
-        if (event !== "") {
+        if (!event) {
+            return res.status(404).json({ error: 'El event_location no existe o no pertenece al usuario autenticado.' });
+        }
+        console.log(event)
+        if (event !== 1) {
             res.status(400).json(event);
         } else {
-            res.status(200).json(event);
+            res.status(200).json("Eventlocation creado");
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -70,7 +77,10 @@ router.put('/', AuthMiddleware, async (req, res) => {
     );
     try {
         const event = await eventLocationService.updateEventLocation(newEventLocation);
-        if (event !== "") {
+        if (!event) {
+            return res.status(404).json({ error: 'El event_location no existe o no pertenece al usuario autenticado.' });
+        }
+        if (event !== 1) {
             res.status(400).json(event);
         } else {
             res.status(200).json(event);

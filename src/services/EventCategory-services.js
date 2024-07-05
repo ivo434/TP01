@@ -30,7 +30,7 @@ export default class EventCategoryService{
     }
     async updateEventCategory(eventCategory){
         try {
-            await eventCategoryRepository.updateCategory(eventCategory)
+            return await eventCategoryRepository.updateCategory(eventCategory)
         } catch (error){
             console.error('Error in UpdateEventCategory:', error);
             throw error;
@@ -38,8 +38,7 @@ export default class EventCategoryService{
     }
     async deleteEventCategory(id){
         try {
-            await eventCategoryRepository.deleteCategory(id)
-            return checkId(id, {})
+            return await eventCategoryRepository.deleteCategory(id)
         } catch (error){
             console.error('Error in DeleteEventCategory:', error);
             throw error;

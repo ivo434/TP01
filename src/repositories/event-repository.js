@@ -205,6 +205,8 @@ export default class EventRepository{
     INNER JOIN event_locations ON events.id_event_location = event_locations.id
     INNER JOIN locations ON event_locations.id_location = locations.id
     INNER JOIN provinces ON locations.id_province = provinces.id
+    INNER JOIN event_tags et ON events.id = et.id_event
+    INNER JOIN tags t ON et.id_tag = t.id
         WHERE `;
         if (name != null) {
             query += `events.name ILIKE '%${name}%' AND `;
@@ -216,7 +218,7 @@ export default class EventRepository{
             query += `start_date = '%${startdate}%' AND `;
         }
         if (tag != null) {
-            query += `tags.name ILIKE '%${tag}%' AND `;
+            query += `t.name ILIKE '%${tag}%' AND `;
         }
         if (query.endsWith(' AND ')) {
             query = query.slice(0, -5);
@@ -277,10 +279,10 @@ export default class EventRepository{
         var query = `INSERT INTO events (name, description, id_event_category, id_event_location, 
             start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
-            const valuesArray = Object.values(evento);
-            valuesArray.shift()
-            const res = await client.query(query, values);
-            return res.rowCount;
+        const valuesArray = Object.values(evento);
+        valuesArray.shift()
+        const res = await client.query(query, valuesArray);
+        return res.rowCount;
     }
     async BorrarEvento(id, id_creator_user){
         if(crudRepository.Get('select * from event_enrollments where id_event = $1', [id]) === null){
@@ -288,7 +290,7 @@ export default class EventRepository{
         }
         else{
             var query = `DELETE FROM events WHERE id = ${id} AND id_creator_user = ${id_creator_user}`;
-            const res = await client.query(query, values);
+            const res = await client.query(query);
             return res.rowCount;
         }
     }
@@ -327,7 +329,7 @@ export default class EventRepository{
         query += ` WHERE id = ${id} AND id_creator_user = ${evento.id_creator_user}`;
         console.log(query)
         try {
-            const res = await client.query(query, values);
+            const res = await client.query(query);
             return res.rowCount;
         } catch (error) {
             console.error('Error al actualizar el evento', error.stack);
