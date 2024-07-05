@@ -23,19 +23,19 @@ export default class ProvinceRepository {
     async EditarProvincia(provincia){
         // Para arreglar: como hacer para que no comitee si select where id = @id es nulo
         var query = 'UPDATE provinces SET'
-        if (name != null) {
+        if (provincia.name != null) {
             query += ` name = '${provincia.name}', `
         }
-        if (full_name != null) {
+        if (provincia.full_name != null) {
             query += ` full_name = '${provincia.full_name}', `
         }
-        if (latitude != null) {
+        if (provincia.latitude != null) {
             query += ` latitude = '${provincia.latitude}', `
         }
-        if (longitude != null) {
+        if (provincia.longitude != null) {
             query += ` longitude = '${provincia.longitude}', `
         }
-        if (display_order != null) {
+        if (provincia.display_order != null) {
             query += ` display_order = ${provincia.display_order}, `
         }
         if (query.endsWith(', ')){

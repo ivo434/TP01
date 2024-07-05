@@ -80,9 +80,8 @@ router.put('/:id', async (req, res) => {
   const newProvince = new Province(req.params.id, name, full_name, latitude, longitude, display_order);
   try {
     const provincia = await provinceService.EditarProvincia(newProvince);
-    const verif = ""
+    var verif = ""
     verif = verificacionProvince2(newProvince)
-    console.log(verif)
     if (verif === "") {
       if (!provincia) {
         return res.status(404).json({ error: 'La provincia no existe.' });
