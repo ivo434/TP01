@@ -6,8 +6,7 @@ class ProvinceService {
 
     async CrearProvincia(provincia) {
         try {
-            await provinceRepository.CrearProvincia(provincia);
-            return { message: 'Provincia creada correctamente' };
+            return await provinceRepository.CrearProvincia(provincia);
         } catch (error) {
             console.error('Error in crearProvincia:', error);
             throw error;
@@ -16,8 +15,7 @@ class ProvinceService {
 
     async BorrarProvincia(id) {
         try {
-            await provinceRepository.BorrarProvincia(id);
-            return { message: 'Provincia borrada correctamente' };
+            return await provinceRepository.BorrarProvincia(id);
         } catch (error) {
             console.error('Error in borrarProvincia:', error);
             throw error;
@@ -26,8 +24,7 @@ class ProvinceService {
 
     async EditarProvincia(provincia) {
         try {
-            await provinceRepository.EditarProvincia(provincia);
-            return { message: 'Provincia actualizada correctamente?' };
+            return await provinceRepository.EditarProvincia(provincia);
         } catch (error) {
             console.error('Error in editarProvincia:', error);
             throw error;

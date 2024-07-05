@@ -50,10 +50,11 @@ router.post('/', async (req, res) => {
   const { name, full_name, latitude, longitude, display_order } = req.body;
   const newProvince = new Province(null, name, full_name, latitude, longitude, display_order);
   try {
-      const provincia = await provinceService.CrearProvincia(newProvince);
-      verif = verificacionProvince1(provincia)
-      if (verif) {
-        res.status(201).json(provincia);
+      await provinceService.CrearProvincia(newProvince);
+      const verif = verificacionProvince1(newProvince)
+      console.log(verif)
+      if (verif === "") {
+        res.status(201).json("Provincia creada");
       } else {
         res.status(400).json(verif)
       }
@@ -79,9 +80,15 @@ router.put('/:id', async (req, res) => {
   const newProvince = new Province(req.params.id, name, full_name, latitude, longitude, display_order);
   try {
     const provincia = await provinceService.EditarProvincia(newProvince);
-    const verif = verificacionProvince2(provincia)
-    if (verif) {
-      res.status(200).json(provincia);
+    const verif = ""
+    verif = verificacionProvince2(newProvince)
+    console.log(verif)
+    if (verif === "") {
+      if (!provincia) {
+        return res.status(404).json({ error: 'La provincia no existe.' });
+      } else {
+        res.status(200).json("Provincia actualizada");
+      }
     } else {
       res.status(400).json(verif)
     }
@@ -91,40 +98,42 @@ router.put('/:id', async (req, res) => {
 });
 
 function verificacionProvince1(provincia){
-  var values = true
+  var values = ""
   if (provincia.name !== undefined) {
     if (provincia.name.length < 3) {
       values += "Nombre menor a 3 "
     }
   } else {
+    console.log(provincia.name)
     values += "Nombre inexistente "
   }
   if (provincia.latitude !== undefined) {
-    if (!Number.isInteger(provincia.latitude)) {
+    if (isNaN(provincia.latitude)) {
       values += "Latitud no es un entero "
     }
   }
   if (provincia.longitude !== undefined) {
-    if (!Number.isInteger(provincia.longitude)) {
+    if (isNaN(provincia.longitude)) {
       values += "Longitud no es un entero "
     }
   }
   return values
 }
 function verificacionProvince2(provincia){
-  var values = true
+  var values = ""
+  console.log(isNaN(provincia.latitude))
   if (provincia.name !== undefined) {
     if (provincia.name.length < 3) {
       values += "Nombre menor a 3 "
     }
   }
   if (provincia.latitude !== undefined) {
-    if (!Number.isInteger(provincia.latitude)) {
+    if (isNaN(provincia.latitude)) {
       values += "Latitud no es un entero "
     }
   }
   if (provincia.longitude !== undefined) {
-    if (!Number.isInteger(provincia.longitude)) {
+    if (isNaN(provincia.longitude)) {
       values += "Longitud no es un entero "
     }
   }
