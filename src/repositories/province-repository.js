@@ -47,7 +47,7 @@ export default class ProvinceRepository {
         return res.rowCount;
     }
     async GetAllProvincias(limit, offset){
-        var query = `SELECT * From provinces limit ${limit} offset ${offset}`
+        var query = `SELECT * From provinces order by id Asc limit ${limit} offset ${offset}`
         const {rows} =  await client.query(query);
         return rows
     }

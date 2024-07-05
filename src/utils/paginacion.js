@@ -18,7 +18,7 @@ export class Pagination {
   }
 
   parseLimit(limit) {
-    return !isNaN(parseInt(limit)) ? parseInt(limit) : 2; // Modificar para que haya más elementos en una "página"
+    return !isNaN(parseInt(limit)) ? parseInt(limit) : 10; // Modificar para que haya más elementos en una "página"
   }
 
   parseOffset(offset) {
