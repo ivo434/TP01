@@ -226,30 +226,29 @@ router.patch("/:id/enrollment/:rating", AuthMiddleware, async (req, res) => {
     const event = await eventService.getEvento(req.params.id);
     let verif = true;
     const fecha = new Date();
-    if ((event !== 0 && event !== undefined) && enrollments !== undefined) {
         enrollments.forEach(item => {
             if (item.id_user === req.user.id) {
                 verif = false;
             }
         });
         if (verif) {
-            return res.status(400).json({ error: 'El usuario no se encuentra registrado en el evento' });
+            res.status(404).json({ error: 'El usuario no se encuentra registrado en el evento' });
         }
-        const eventStartDate = new Date(event[0].start_date);
-        console.log(event[0]);
-        if (eventStartDate > fecha) {
-            return res.status(400).json({ error: 'No es posible eliminarse de un evento que ya ha sucedido o que se realiza hoy' });
+        else{
+            const eventStartDate = new Date(event[0].start_date);
+            console.log(event[0]);
+            if (eventStartDate > fecha) {
+                res.status(400).json({ error: 'No es posible ratear un evento que va a suceder o que se realiza hoy' });
+            }
+            else {
+                try {
+                    await eventService.patchEnrollment(req.user.id, req.params.id, req.params.rating, observations);
+                    res.status(200).json("Usuario ha puesto su rating correctamente");
+                } catch(error){
+                    res.status(500).json("Internal server error")
+                }
+            }
         }
-        try {
-            const enrollment = await eventService.patchEnrollment(req.user.id, req.params.id, req.params.rating, observations);
-            return res.status(200).json("Usuario ha puesto su rating correctamente", enrollment);
-        } catch (error) {
-            console.log("Error al puntuar");
-            return res.status(404).json("Un Error");
-        }
-    } else {
-        return res.status(404).json({ error: 'el id sea inexistente' });
-    }
 });
 
 export default router;
