@@ -69,7 +69,7 @@ router.delete('/:id', async (req, res) => {
     if (!provincia) {
       return res.status(404).json({ error: 'La provincia no existe.' });
     }
-    res.status(200).json({ message: 'Provincia eliminada correctamente', provincia });
+    res.status(200).json({ message: 'Provincia eliminada correctamente'});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
