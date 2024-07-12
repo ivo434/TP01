@@ -15,7 +15,13 @@ router.get('/', async (req, res) => {
     const collection = await eventCategoryService.getEventCategories(limit, offset);
     const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
     res.status(200).json({
-      paginacion: paginatedResponse
+      collection: paginatedResponse.collection,
+            paginacion: {
+                limit: paginatedResponse.limit, 
+                offset: paginatedResponse.offset, 
+                nextPage: paginatedResponse.nextPage,
+                total: paginatedResponse.collection.length
+            }
     });
   } catch (error) {
     console.error('Error al obtener todas las categorías:', error);

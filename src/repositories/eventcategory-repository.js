@@ -13,7 +13,7 @@ export default class EventCategoryRepository{
     async getCategoriesById(id){
         var query = `SELECT * FROM event_categories WHERE id = ${id}`
         const values = await client.query(query)
-        if (values.rowsCount >= 1) {
+        if (values.rowCount >= 1) {
             return values.rows
         }
         else{

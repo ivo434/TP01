@@ -304,7 +304,7 @@ export default class EventRepository{
             return res.rowCount;
         }
     }
-    async EditarEvento(id, evento){
+    async EditarEvento(evento){
         var query = 'UPDATE events SET '
         if (evento.name != null) {
             query += `name = '${evento.name}', `;
@@ -336,7 +336,7 @@ export default class EventRepository{
         if (query.endsWith(', ')){
             query = query.slice(0,-2)
         }
-        query += ` WHERE id = ${id} AND id_creator_user = ${evento.id_creator_user}`;
+        query += ` WHERE id = ${evento.id} AND id_creator_user = ${evento.id_creator_user}`;
         console.log(query)
         try {
             const res = await client.query(query);

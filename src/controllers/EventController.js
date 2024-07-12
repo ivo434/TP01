@@ -26,7 +26,13 @@ router.get('/', async (req, res) => {
         const collection = await eventService.busquedaEventos(name, category, startdate, tag, limit, offset);
         const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
         res.status(200).json({
-            paginacion: paginatedResponse
+            collection: paginatedResponse.collection,
+            paginacion: {
+                limit: paginatedResponse.limit, 
+                offset: paginatedResponse.offset, 
+                nextPage: paginatedResponse.nextPage,
+                total: paginatedResponse.collection.length
+            }
         });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -108,21 +114,21 @@ router.delete('/:id', AuthMiddleware, async (req, res) => {
             if (!filas) {
                 return res.status(404).json({ error: 'el id sea inexistente' });
             }
-            return res.status(200).json({ mensaje: 'Se elimino el evento', filas });
+            return res.status(200).json({ mensaje: 'Se elimino el evento'});
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-router.put('/:id', AuthMiddleware, async (req, res) => {
-    const { name, description, id_event_category, id_event_location, start_date,
+router.put('/', AuthMiddleware, async (req, res) => {
+    const { id, name, description, id_event_category, id_event_location, start_date,
         duration_in_minutes, price, enabled_for_enrollment, max_assistance } = req.body;
     const idPayload = req.user.id;
-    const evento = new Event(null, name, description, id_event_category, id_event_location, start_date,
+    const evento = new Event(id, name, description, id_event_category, id_event_location, start_date,
         duration_in_minutes, price, enabled_for_enrollment, max_assistance, idPayload);
     try {
-        const newEvent = await eventService.EditarEvento(req.params.id, evento);
+        const newEvent = await eventService.EditarEvento(evento);
         console.log(newEvent)
         if (!newEvent) {
             return res.status(404).json({ error: 'el id sea inexistente' });

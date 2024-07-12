@@ -15,7 +15,13 @@ router.get('/', async (req, res) => {
         const collection = await locationService.getAllLocations( limit, offset);
         const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
         res.status(200).json({
-            paginacion: paginatedResponse
+            collection: paginatedResponse.collection,
+            paginacion: {
+                limit: paginatedResponse.limit, 
+                offset: paginatedResponse.offset, 
+                nextPage: paginatedResponse.nextPage,
+                total: paginatedResponse.collection.length
+            }
         });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -44,7 +50,13 @@ router.get('/:id/event_location', AuthMiddleware, async (req, res) => {
         } else {
             const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
             res.status(200).json({
-                paginacion: paginatedResponse
+                collection: paginatedResponse.collection,
+                paginacion: {
+                    limit: paginatedResponse.limit, 
+                    offset: paginatedResponse.offset, 
+                    nextPage: paginatedResponse.nextPage,
+                    total: paginatedResponse.collection.length
+                }
             });
         }
     } catch (error) {

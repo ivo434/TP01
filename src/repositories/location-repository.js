@@ -14,7 +14,7 @@ export default class LocationRepository{
         var query = `SELECT * FROM locations WHERE id = ${id}`
         const values = await client.query(query)
         if (values.rowCount >= 1) {
-            return values.rows
+            return values.rows[0]
         }
         else{
             return values.rowCount

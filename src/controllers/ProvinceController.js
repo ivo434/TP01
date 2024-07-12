@@ -39,7 +39,13 @@ router.get('/', async (req, res) => {
     const collection = await provinceService.GetAllProvincias(limit, offset);
     const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
     res.status(200).json({
-      paginacion: paginatedResponse
+      collection: paginatedResponse.collection,
+            paginacion: {
+                limit: paginatedResponse.limit, 
+                offset: paginatedResponse.offset, 
+                nextPage: paginatedResponse.nextPage,
+                total: paginatedResponse.collection.length
+            }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

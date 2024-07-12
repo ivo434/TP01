@@ -80,7 +80,7 @@ class EventService {
             throw error;
         }
     }
-    async EditarEvento(id, evento) {
+    async EditarEvento(evento) {
         try {
             const values = [
                 evento.id_event_location
@@ -113,7 +113,7 @@ class EventService {
                 }
             }
             if (verif === "") {
-                return await eventRepository.EditarEvento(id, evento)
+                return await eventRepository.EditarEvento(evento)
             } else{
                 return verif
             }
@@ -124,7 +124,7 @@ class EventService {
     }
     async enrollUserToEvent(eventEnrollment){
         try {
-            return await eventRepository.enrollUserToEvent(eventEnrollment); // NO ESTA HECHO
+            return await eventRepository.enrollUserToEvent(eventEnrollment);
         } catch (error) {
             console.error('Error in enrollUserToEvent', error);
             throw error;
@@ -132,7 +132,7 @@ class EventService {
       }
       async removeUserFromEvent(eventId, userId){
         try {
-            return await eventRepository.removeUserFromEvent(eventId, userId); // NO ESTA HECHO
+            return await eventRepository.removeUserFromEvent(eventId, userId); 
         } catch (error) {
             console.error('Error in enrollUserToEvent', error);
             throw error;
@@ -140,7 +140,7 @@ class EventService {
       }
     async patchEnrollment(id_user, id_event, rating, observations){
         try {
-            return await eventRepository.patchEnrollment(id_user, id_event, rating, observations); // NO ESTA HECHO
+            return await eventRepository.patchEnrollment(id_user, id_event, rating, observations);
         } catch (error) {
             console.error('Error in postInscripcionEvento', error);
             throw error;

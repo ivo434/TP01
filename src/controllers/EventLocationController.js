@@ -16,7 +16,13 @@ router.get('/', AuthMiddleware, async (req, res) => {
         const collection = await eventLocationService.getEventLocations(req.user.id, limit, offset);
         const paginatedResponse = pagination.buildPaginationDto(limit, offset, collection, req.path);
         res.status(200).json({
-            paginacion: paginatedResponse
+            collection: paginatedResponse.collection,
+            paginacion: {
+                limit: paginatedResponse.limit, 
+                offset: paginatedResponse.offset, 
+                nextPage: paginatedResponse.nextPage,
+                total: paginatedResponse.collection.length
+            }
         });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });

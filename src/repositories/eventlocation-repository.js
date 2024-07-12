@@ -13,7 +13,7 @@ export default class EventLocationRepository{
     async getEventLocationById(id, id_user){
         var query = `SELECT * FROM event_locations WHERE id = ${id} and id_creator_user = ${id_user}`;
         const values =  await client.query(query);
-        if (values.rowsCount >= 1) {
+        if (values.rowCount >= 1) {
             return values.rows
         }
         else{
